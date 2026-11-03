@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="app-version" content="2026-11-04c">
+<meta name="app-version" content="2026-11-04d">
 <title>My English Practice</title>
 <style>
 :root{--bg:#fdf6ec;--card:#fff;--ink:#3b2f2a;--accent:#e07a5f;--accent2:#81b29a;--muted:#8a7b72;--line:#f0e2d0}
@@ -48,7 +48,28 @@ input[type=text]{width:100%;padding:10px 12px;border:1px solid #e3d3bf;border-ra
 .fb{margin-top:10px;padding:10px 12px;border-radius:10px;display:none;font-size:.95rem}
 .fb.ok{background:#e6f3ec;color:#2f6b4f;display:block}
 .fb.no{background:#fdeae4;color:#9a3d22;display:block}
-.done-badge{float:right;background:var(--accent2);color:#fff;border-radius:999px;padding:2px 10px;font-size:.78rem}
+.card.item.checked{border:2px solid #4caf7d;background:#f6fcf8}
+.done-badge{float:right;background:#4caf7d;color:#fff;border-radius:999px;padding:2px 10px;font-size:.8rem;font-weight:700}
+.chkrow{border-top:1px dashed var(--line);padding-top:10px;margin-top:12px}
+.btn.chk{background:#fff;color:#2f6b4f;border:2px solid #4caf7d;font-weight:700}
+.btn.chk.on{background:#4caf7d;color:#fff}
+.quizbtn{display:block;width:100%;border:none;border-radius:16px;padding:18px 16px;margin:8px 0 14px;font-size:1.35rem;font-weight:800;color:#fff;cursor:pointer;background:linear-gradient(135deg,#6c8cd5,#8e6bd1);box-shadow:0 4px 12px rgba(90,80,180,.25)}
+.quizbtn small{display:block;font-size:.85rem;font-weight:400;opacity:.92;margin-top:4px}
+.day.alldone{border:2px solid #4caf7d}
+.party{float:right;background:#fff3c4;color:#8a6100;border-radius:999px;padding:2px 10px;font-size:.85rem;font-weight:700}
+.datetag{float:right;background:#eef2fb;color:#4a5f99;border-radius:999px;padding:2px 10px;font-size:.78rem}
+.qstat{float:right;margin-right:6px;background:#e6f3ec;color:#2f6b4f;border-radius:999px;padding:2px 10px;font-size:.78rem}
+.summary{border:2px solid #8e6bd1;text-align:center}
+.summary h3{margin:0 0 6px}
+.shadow .ph{font-weight:800;border-radius:999px;padding:2px 12px;color:#fff;background:#888}
+.shadow.ph-listen{background:#eaf2fd;border:2px solid #4a7fd4}
+.shadow.ph-listen .ph{background:#4a7fd4}
+.shadow.ph-ready{background:#fff6dc;border:2px solid #e0a800}
+.shadow.ph-ready .ph{background:#e0a800;font-size:1.1rem}
+.shadow.ph-rec{background:#fdecea;border:2px solid #c0392b}
+.shadow.ph-done{background:#e9f6ee;border:2px solid #4caf7d}
+.shadow.ph-done .ph{background:#4caf7d}
+.shadow.ph-warn{background:#fff4ec;border:2px solid #e07a5f}
 .blank{display:inline-block;min-width:60px;border-bottom:2px dashed var(--accent);margin:0 3px}
 .hidden{display:none}
 footer{text-align:center;color:var(--muted);font-size:.85rem;padding:24px}
@@ -63,7 +84,7 @@ footer{text-align:center;color:var(--muted);font-size:.85rem;padding:24px}
 <footer>Progress is saved in this browser only · 🔊 跟讀：先聽標準發音，再錄自己的聲音 · <span id="appver" style="opacity:.6"></span></footer>
 <script>
 // Bump BOTH this constant and the <meta name="app-version"> tag on every release.
-const APP_VERSION = "2026-11-04c";
+const APP_VERSION = "2026-11-04d";
 (function(){
   var el=document.getElementById('appver'); if(el) el.textContent='v'+APP_VERSION;
   var busy=false;
@@ -133,83 +154,176 @@ const DAYS=[
 ];
 
 // ===== State =====
-const KEY="english-progress-v2";
-let done={}; try{done=JSON.parse(localStorage.getItem(KEY)||"{}");}catch(e){}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(done));}catch(e){}}
+const KEY="english-progress-v2";        // legacy: auto-"done" set by Check (before v2026-11-04d)
+const CKEY="english-checked-v1";        // ✅ 完成 check-offs = daily task status
+let checked={};
+try{
+  const raw=localStorage.getItem(CKEY);
+  if(raw!==null)checked=JSON.parse(raw)||{};
+  else{checked=JSON.parse(localStorage.getItem(KEY)||"{}")||{};localStorage.setItem(CKEY,JSON.stringify(checked));}  // migrate old done → checked
+}catch(e){}
+function save(){try{localStorage.setItem(CKEY,JSON.stringify(checked));}catch(e){}}
 const app=document.getElementById("app");
 let tab="vocab";
+let view="home";
+let quiz=null;   // {list:[{dayId,id}], res:{uid:"ok"|"shown"|"practiced"}}
 
 function norm(s){return s.toLowerCase().replace(/[’]/g,"'").replace(/[.,!?;:"“”]/g," ").replace(/\s+/g," ").trim();}
 function items(day){return day.vocab.map(v=>({...v,kind:"vocab"})).concat(day.sentences.map(s=>({...s,kind:"sent"})));}
 function key(day,id){return day.id+"/"+id;}
-function countDone(day,kind){return items(day).filter(i=>(!kind||i.kind===kind)&&done[key(day,i.id)]).length;}
+function uid(dayId,id){return (dayId+"_"+id).replace(/[^\w-]/g,"_");}
+function dayById(id){return DAYS.find(d=>d.id===id);}
+function countDone(day,kind){return items(day).filter(i=>(!kind||i.kind===kind)&&checked[key(day,i.id)]).length;}
+function dayStats(d){const nv=countDone(d,"vocab"),ns=countDone(d,"sent"),total=d.vocab.length+d.sentences.length;return {nv,ns,n:nv+ns,total,all:total>0&&nv+ns===total};}
 
 // ===== Views =====
 function route(){
+  stopShadow();
   const h=decodeURIComponent(location.hash.slice(1));
-  const day=DAYS.find(d=>d.id===h);
-  day?renderDay(day):renderHome();
+  if(h==="quiz"){if(!quiz)newQuiz();renderQuiz();}
+  else{const day=dayById(h);day?renderDay(day):renderHome();}
   window.scrollTo(0,0);
 }
 function renderHome(){
-  app.innerHTML='<h2 style="margin:8px 4px">練習日期</h2>'+DAYS.slice().reverse().map(d=>{
-    const total=items(d).length,n=countDone(d);
-    return `<a class="card day" href="#${d.id}"><h2>📅 ${d.label}</h2>
+  view="home";quiz=null;
+  const nSent=DAYS.reduce((n,d)=>n+d.sentences.length,0);
+  app.innerHTML=`<button class="quizbtn" id="quiz-btn" onclick="startQuiz()">🎲 隨機測驗<small>從所有日期隨機抽 ${Math.min(5,nSent)} 個句子來練習</small></button>
+  <h2 style="margin:8px 4px">練習日期</h2>`+DAYS.slice().reverse().map(d=>{
+    const st=dayStats(d);
+    return `<a class="card day ${st.all?'alldone':''}" href="#${d.id}">${st.all?'<span class="party">🎉 完成</span>':''}<h2>📅 ${d.label}</h2>
       <div class="meta">${d.topics}</div>
-      <div class="meta">單字 ${countDone(d,"vocab")}/${d.vocab.length} · 語句 ${countDone(d,"sent")}/${d.sentences.length}</div>
-      <div class="bar"><div style="width:${n/total*100}%"></div></div></a>`;}).join("");
+      <div class="meta">✅ 單字 ${st.nv}/${d.vocab.length} · 語句 ${st.ns}/${d.sentences.length}</div>
+      <div class="bar"><div style="width:${st.n/st.total*100}%"></div></div></a>`;}).join("");
 }
+function cardHTML(day,it,opt){
+  opt=opt||{};
+  const u=uid(day.id,it.id),isChk=!opt.quiz&&!!checked[key(day,it.id)];
+  let head,q,ph;
+  if(it.kind==="vocab"){head="中文 → English";q=it.zh;ph="Type the English";}
+  else{head=it.t+" · "+(it.type==="fill"?"Fill in the blank":"Fix the sentence");
+    q=it.type==="fill"?it.q.replace(/___/g,'<span class="blank"></span>'):"“"+it.q+"”";
+    ph=it.type==="fill"?"Type the missing words":"Type the corrected sentence";}
+  return `<div class="card item ${isChk?'checked':''}" id="card-${u}">
+    ${opt.quiz?`<span class="datetag">📅 ${day.label}</span><span class="qstat hidden" id="qs-${u}"></span>`
+      :`<span id="badge-${u}" class="done-badge ${isChk?'':'hidden'}">✓ 已完成</span>`}
+    <div class="topic">${opt.quiz?`第 ${opt.num} 題 · `:""}${head}</div>
+    <div class="q">${q}</div>
+    ${it.hint?`<div class="hint">Hint: ${it.hint}</div>`:""}
+    <input type="text" id="in-${u}" placeholder="${ph}" autocomplete="off" autocapitalize="off" onkeydown="if(event.key==='Enter')check('${day.id}','${it.id}')">
+    <div class="row">
+      <button class="btn" onclick="check('${day.id}','${it.id}')">Check</button>
+      <button class="btn mic" id="sh-btn-${u}" onclick="shadow('${day.id}','${it.id}')">🔊 跟讀</button>
+      <button class="btn ghost" onclick="reveal('${day.id}','${it.id}')">Show answer</button>
+    </div>
+    <div class="fb" id="fb-${u}"></div>
+    <div class="shadow${recordings[u]?' ph-done':''}" id="sh-${u}">${shadowDoneHTML(day.id,it.id)}</div>
+    ${opt.quiz?"":`<div class="row chkrow"><button class="btn chk ${isChk?'on':''}" id="chk-${u}" onclick="toggleCheck('${day.id}','${it.id}')">${chkLabel(isChk)}</button></div>`}
+  </div>`;
+}
+function chkLabel(on){return on?"✓ 已完成（點一下取消）":"✅ 完成";}
 function renderDay(day){
+  view="day";
   stopShadow();
   const list=tab==="vocab"?day.vocab.map(v=>({...v,kind:"vocab"})):day.sentences.map(s=>({...s,kind:"sent"}));
-  const n=list.filter(i=>done[key(day,i.id)]).length;
   let html=`<div class="row"><button class="back" onclick="location.hash=''">← 所有日期</button></div>
   <h2 style="margin:12px 4px 0">📅 ${day.label}</h2>
-  <nav><button class="${tab==='vocab'?'on':''}" onclick="tab='vocab';renderDay(DAYS.find(d=>d.id==='${day.id}'))">單字 ${countDone(day,"vocab")}/${day.vocab.length}</button>
-  <button class="${tab==='sent'?'on':''}" onclick="tab='sent';renderDay(DAYS.find(d=>d.id==='${day.id}'))">語句練習 ${countDone(day,"sent")}/${day.sentences.length}</button></nav>
-  <div class="card"><strong>${tab==='vocab'?'單字':'語句練習'}進度</strong> — ${n} / ${list.length}
-  <div class="bar"><div style="width:${n/list.length*100}%"></div></div></div>`;
-  html+=list.map(it=>{
-    const k=key(day,it.id), isDone=done[k];
-    let head,q,ph;
-    if(it.kind==="vocab"){head="中文 → English";q=it.zh;ph="Type the English";}
-    else{head=it.t+" · "+(it.type==="fill"?"Fill in the blank":"Fix the sentence");
-      q=it.type==="fill"?it.q.replace(/___/g,'<span class="blank"></span>'):"“"+it.q+"”";
-      ph=it.type==="fill"?"Type the missing words":"Type the corrected sentence";}
-    return `<div class="card">
-      <span id="badge-${it.id}" class="done-badge ${isDone?'':'hidden'}">done</span>
-      <div class="topic">${head}</div>
-      <div class="q">${q}</div>
-      ${it.hint?`<div class="hint">Hint: ${it.hint}</div>`:""}
-      <input type="text" id="in-${it.id}" placeholder="${ph}" onkeydown="if(event.key==='Enter')check('${day.id}','${it.id}')">
-      <div class="row">
-        <button class="btn" onclick="check('${day.id}','${it.id}')">Check</button>
-        <button class="btn mic" id="sh-btn-${it.id}" onclick="shadow('${day.id}','${it.id}')">🔊 跟讀</button>
-        <button class="btn ghost" onclick="reveal('${day.id}','${it.id}')">Show answer</button>
-      </div>
-      <div class="fb" id="fb-${it.id}"></div>
-      <div class="shadow" id="sh-${it.id}">${shadowDoneHTML(day.id,it.id)}</div></div>`;}).join("");
-  html+=`<div class="row"><button class="btn ghost" onclick="resetDay('${day.id}')">重設這一天的進度</button></div>`;
+  <nav><button id="tab-vocab" class="${tab==='vocab'?'on':''}" onclick="tab='vocab';renderDay(dayById('${day.id}'))"></button>
+  <button id="tab-sent" class="${tab==='sent'?'on':''}" onclick="tab='sent';renderDay(dayById('${day.id}'))"></button></nav>
+  <div class="card"><strong>今日任務：${tab==='vocab'?'單字':'語句練習'}</strong> — <span id="sec-n"></span>
+  <div class="bar"><div id="sec-bar"></div></div><div class="hint" id="sec-msg">覺得這題沒問題了，就按卡片下方的 ✅ 完成 勾起來。</div></div>`;
+  html+=list.map(it=>cardHTML(day,it)).join("");
+  html+=`<div class="row"><button class="btn ghost" onclick="resetDay('${day.id}')">重設這一天的勾選</button></div>`;
   app.innerHTML=html;
+  updateDayCounts(day);
+}
+function updateDayCounts(day){
+  const st=dayStats(day);
+  const tv=document.getElementById("tab-vocab"),ts=document.getElementById("tab-sent");
+  if(tv)tv.textContent=`單字 ${st.nv}/${day.vocab.length}`;
+  if(ts)ts.textContent=`語句練習 ${st.ns}/${day.sentences.length}`;
+  const tot=tab==="vocab"?day.vocab.length:day.sentences.length,n=tab==="vocab"?st.nv:st.ns;
+  const sn=document.getElementById("sec-n"),sb=document.getElementById("sec-bar"),sm=document.getElementById("sec-msg");
+  if(sn)sn.textContent=`${n} / ${tot}`;
+  if(sb)sb.style.width=(tot?n/tot*100:0)+"%";
+  if(sm&&st.all)sm.textContent="🎉 這一天的單字和語句全部完成了！";
+  else if(sm&&n===tot&&tot)sm.textContent="👍 這一區全部完成！換另一個分頁繼續。";
+}
+function toggleCheck(dayId,id){
+  const d=dayById(dayId),k=key(d,id),u=uid(dayId,id);
+  if(checked[k])delete checked[k];else checked[k]=true;
+  save();
+  const on=!!checked[k];
+  const card=document.getElementById("card-"+u),badge=document.getElementById("badge-"+u),btn=document.getElementById("chk-"+u);
+  if(card)card.classList.toggle("checked",on);
+  if(badge)badge.classList.toggle("hidden",!on);
+  if(btn){btn.classList.toggle("on",on);btn.textContent=chkLabel(on);}
+  updateDayCounts(d);
+}
+
+// ===== Random quiz =====
+function newQuiz(){
+  const pool=[];DAYS.forEach(d=>d.sentences.forEach(s=>pool.push({dayId:d.id,id:s.id})));
+  for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]];}
+  quiz={list:pool.slice(0,5),res:{}};
+}
+function startQuiz(){newQuiz();if(location.hash==="#quiz")route();else location.hash="quiz";}
+function renderQuiz(){
+  view="quiz";
+  const n=quiz.list.length;
+  let html=`<div class="row"><button class="back" onclick="location.hash=''">← 回首頁</button></div>
+  <h2 style="margin:12px 4px 0">🎲 隨機測驗</h2>
+  <div class="card"><strong>測驗進度</strong> — <span id="qprog">0 / ${n}</span>
+  <div class="bar"><div id="qbar" style="width:0"></div></div>
+  <div class="hint">每題答對、看答案或跟讀錄完就算練習過。測驗結果不會影響每日的 ✅ 勾選。</div></div>`;
+  html+=quiz.list.map((q,i)=>{const d=dayById(q.dayId);const it=items(d).find(x=>x.kind==="sent"&&x.id===q.id);return cardHTML(d,it,{quiz:true,num:i+1});}).join("");
+  html+=`<div id="qsum"></div>`;
+  app.innerHTML=html;
+  updateQuizProgress();
+}
+const QRANK={practiced:1,shown:2,ok:3};
+function quizMark(dayId,id,r){
+  if(view!=="quiz"||!quiz)return;
+  if(!quiz.list.some(q=>q.dayId===dayId&&q.id===id))return;
+  const u=uid(dayId,id),prev=quiz.res[u];
+  // "shown" before a correct answer still counts as shown
+  if(prev==="shown"&&r==="ok")return;
+  if(!prev||QRANK[r]>QRANK[prev])quiz.res[u]=r;
+  const tag=document.getElementById("qs-"+u);
+  if(tag){tag.classList.remove("hidden");tag.textContent={ok:"✓ 答對",shown:"💡 看過答案",practiced:"🔊 跟讀過"}[quiz.res[u]];}
+  updateQuizProgress();
+}
+function updateQuizProgress(){
+  if(view!=="quiz"||!quiz)return;
+  const n=quiz.list.length,vals=Object.values(quiz.res),k=vals.length;
+  const pg=document.getElementById("qprog"),bar=document.getElementById("qbar"),sum=document.getElementById("qsum");
+  if(pg)pg.textContent=`${k} / ${n}`;
+  if(bar)bar.style.width=(n?k/n*100:0)+"%";
+  if(!sum)return;
+  const btns=`<div class="row"><button class="btn" onclick="startQuiz()">🎲 再抽五題</button><button class="btn ghost" onclick="location.hash=''">🏠 回首頁</button></div>`;
+  if(k>=n){
+    const c=r=>vals.filter(v=>v===r).length;
+    sum.innerHTML=`<div class="card summary"><h3>🎉 這組測驗完成！</h3>
+      <div>✍️ 自己答對 <b>${c("ok")}</b> 題 · 💡 看答案 <b>${c("shown")}</b> 題 · 🔊 只跟讀 <b>${c("practiced")}</b> 題</div>${btns}</div>`;
+  }else sum.innerHTML=btns;
 }
 
 // ===== Actions =====
-function find(dayId,id){const d=DAYS.find(x=>x.id===dayId);return [d,items(d).find(i=>i.id===id)];}
+function find(dayId,id){const d=dayById(dayId);return [d,items(d).find(i=>i.id===id)];}
 function answerOf(it){return it.kind==="vocab"?it.w:it.a;}
 function shown(it){return it.kind==="vocab"?`<b>${it.show}</b><br><span class="hint">${it.ex}</span>`:`<b>${it.show}</b>`;}
+// Self-test only: does NOT mark the item as done (use ✅ 完成 for that).
 function check(dayId,id){
-  const [d,it]=find(dayId,id);
-  const v=norm(document.getElementById("in-"+id).value), fb=document.getElementById("fb-"+id);
+  const [d,it]=find(dayId,id),u=uid(dayId,id);
+  const v=norm(document.getElementById("in-"+u).value),fb=document.getElementById("fb-"+u);
   if(!v){fb.className="fb no";fb.textContent="Type your answer first 🙂";return false;}
   const full=it.kind==="vocab"?norm(it.ex):norm(it.show);
   const ok=answerOf(it).some(a=>norm(a)===v)||full===v;
-  if(ok){fb.className="fb ok";fb.innerHTML="✅ Nice!<br>"+shown(it);done[key(d,id)]=true;save();
-    document.getElementById("badge-"+id).classList.remove("hidden");}
+  if(ok){fb.className="fb ok";fb.innerHTML="✅ Nice!<br>"+shown(it)+(view==="day"&&!checked[key(d,id)]?'<div class="hint">覺得沒問題就按下方 ✅ 完成 勾起來。</div>':"");quizMark(dayId,id,"ok");}
   else{fb.className="fb no";fb.innerHTML="Not quite. Try again, or tap “Show answer”.";}
   return ok;
 }
-function reveal(dayId,id){const [d,it]=find(dayId,id);const fb=document.getElementById("fb-"+id);fb.className="fb ok";fb.innerHTML="💡 Answer:<br>"+shown(it);}
-function resetDay(dayId){if(!confirm("Reset progress for this day?"))return;Object.keys(done).forEach(k=>{if(k.startsWith(dayId+"/"))delete done[k];});save();route();}
+function reveal(dayId,id){const [d,it]=find(dayId,id);const fb=document.getElementById("fb-"+uid(dayId,id));fb.className="fb ok";fb.innerHTML="💡 Answer:<br>"+shown(it);quizMark(dayId,id,"shown");}
+function resetDay(dayId){if(!confirm("要清除這一天的 ✅ 完成勾選嗎？"))return;Object.keys(checked).forEach(k=>{if(k.startsWith(dayId+"/"))delete checked[k];});save();route();}
 
 // ===== Shadowing (跟讀) =====
 const TTS=window.speechSynthesis||null;
@@ -292,89 +406,98 @@ function startMeter(stream){
 
 function modelTexts(it){return it.kind==="vocab"?[it.show].concat(it.ex?[it.ex]:[]):[it.show];}
 function esc(t){return String(t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
-function panel(id){return document.getElementById("sh-"+id);}
+function panel(u){return document.getElementById("sh-"+u);}
+function setPhase(p,ph,html){if(!p)return;p.className="shadow"+(ph?" ph-"+ph:"");p.innerHTML=html;}
+function modelsHTML(it){return modelTexts(it).map(t=>`<div class="model">${esc(t)}</div>`).join("");}
 function mimePick(){
   if(!window.MediaRecorder||!MediaRecorder.isTypeSupported)return "";
   for(const t of ["audio/mp4","audio/webm;codecs=opus","audio/webm"])if(MediaRecorder.isTypeSupported(t))return t;
   return "";
 }
+// Recording window (seconds): scales with the words to say, optionally with the measured model duration.
+function wordCount(texts){return [].concat(texts).join(" ").trim().split(/\s+/).filter(Boolean).length;}
+function recWindow(texts,measured){
+  const base=wordCount(texts)*0.45+1.2;
+  let secs=base;
+  // If we really measured the model speech, allow a bit longer for slow sentences, but never runaway.
+  if(measured&&measured>0.4)secs=Math.max(base,Math.min(measured*1.25+0.8,base*1.6));
+  return Math.round(Math.max(2.5,Math.min(15,secs))*10)/10;
+}
 function shadowDoneHTML(dayId,id,note){
-  const has=!!recordings[id];
+  const u=uid(dayId,id),has=!!recordings[u];
   if(!has&&!note)return "";
-  return `${note?`<div class="hint" style="margin-bottom:6px">${note}</div>`:""}
+  return `${note?`<div class="st" style="margin-bottom:6px">${note}</div>`:""}
     <div class="row" style="margin-top:0">
-      ${has?`<button class="btn mic" onclick="playMine('${id}')">▶️ 聽我的錄音</button>`:""}
+      ${has?`<button class="btn mic" onclick="playMine('${dayId}','${id}')">▶️ 聽我的錄音</button>`:""}
       <button class="btn ghost" onclick="replayModel('${dayId}','${id}')">🔊 再聽一次標準</button>
       <button class="btn" onclick="shadow('${dayId}','${id}')">🔁 再練一次</button>
     </div>`;
 }
 function stopPlayer(){if(player){try{player.pause();}catch(e){}}}
+function clearTimers(s){s.timers.forEach(t=>{clearTimeout(t);clearInterval(t);});s.timers=[];}
 function stopShadow(){
   stopPlayer();
   if(!cur)return;
   const s=cur;cur=null;
   s.cancelled=true;
-  s.timers.forEach(t=>{clearTimeout(t);clearInterval(t);});
+  clearTimers(s);
   if(TTS){try{TTS.cancel();}catch(e){}}
   if(s.rec&&s.rec.state!=="inactive"){s.discard=true;try{s.rec.stop();}catch(e){}}
   if(s.meter){try{s.meter.stop();}catch(e){}s.meter=null;}
-  const b=document.getElementById("sh-btn-"+s.id);if(b){b.classList.remove("rec");b.textContent="🔊 跟讀";}
-  const p=panel(s.id);if(p)p.innerHTML=shadowDoneHTML(s.dayId,s.id);
+  const b=document.getElementById("sh-btn-"+s.u);if(b){b.classList.remove("rec");b.textContent="🔊 跟讀";b.onclick=()=>shadow(s.dayId,s.id);}
+  setPhase(panel(s.u),recordings[s.u]?"done":"",shadowDoneHTML(s.dayId,s.id));
 }
-// Speak the model; onDone(durationSeconds) is called once when finished.
+// Speak the model; onDone(measuredSeconds|null, spoke) is called once.
 function speakModel(s,it,onDone){
   const texts=modelTexts(it);
-  const words=texts.join(" ").split(/\s+/).length;
-  const est=words/2.5/0.9+0.6;     // rough estimate in seconds
-  if(!TTS||!window.SpeechSynthesisUtterance){onDone(est,false);return;}
+  const est=wordCount(texts)/2.5/0.9+0.6;
+  if(!TTS||!window.SpeechSynthesisUtterance){onDone(null,false);return;}
   try{TTS.cancel();}catch(e){}
-  let started=Date.now(),finished=false;
-  const finish=()=>{if(finished||s.cancelled)return;finished=true;
-    const d=(Date.now()-started)/1000;onDone(d>0.5?Math.min(d,est*3):est,true);};
+  let started=0,finished=false;
+  const finish=real=>{if(finished||s.cancelled)return;finished=true;
+    const d=started?(Date.now()-started)/1000:0;
+    onDone(real&&d>0.4&&d<est*3?d:null,true);};
   keepUtts=texts.map((t,i)=>{
     const u=new SpeechSynthesisUtterance(t);
     u.lang="en-US";if(enVoice)u.voice=enVoice;u.rate=0.9;u.pitch=1;
     if(i===0)u.onstart=()=>{started=Date.now();};
-    if(i===texts.length-1){u.onend=finish;u.onerror=finish;}
+    if(i===texts.length-1){u.onend=()=>finish(true);u.onerror=()=>finish(false);}
     return u;
   });
-  keepUtts.forEach(u=>TTS.speak(u));      // called inside the tap handler (iOS needs this)
-  // Safety net: some iOS versions don't fire onend
-  s.timers.push(setTimeout(finish,(est*2.2+4)*1000));
+  keepUtts.forEach(u=>TTS.speak(u));      // inside the tap handler (iOS needs this)
+  s.timers.push(setTimeout(()=>finish(false),(est*2.2+4)*1000));   // some iOS versions skip onend
 }
 function shadow(dayId,id){
   const [d,it]=find(dayId,id);
   stopShadow();
-  const s={dayId,id,timers:[],cancelled:false,rec:null,stream:null,chunks:[]};
+  const u=uid(dayId,id);
+  const s={dayId,id,u,timers:[],cancelled:false,rec:null,stream:null,chunks:[]};
   cur=s;
   ensureAudioCtx();   // create/resume inside the tap (iOS)
-  const p=panel(id),b=document.getElementById("sh-btn-"+id);
-  b.classList.add("rec");b.textContent="⏹ 停止";
-  b.onclick=()=>{ if(cur===s){stopShadow();} else shadow(dayId,id); };
-  p.innerHTML=`<div class="st">🔊 <b>Listen… 先聽標準發音</b></div>
-    ${modelTexts(it).map(t=>`<div class="model">${esc(t)}</div>`).join("")}`;
-  speakModel(s,it,(dur,spoke)=>{
+  const b=document.getElementById("sh-btn-"+u);
+  if(b){b.classList.add("rec");b.textContent="⏹ 停止";b.onclick=()=>{if(cur===s)stopShadow();else shadow(dayId,id);};}
+  setPhase(panel(u),"listen",`<div class="st"><span class="ph">🔊 聽</span><b>先聽標準發音，先不要唸</b></div>${modelsHTML(it)}`);
+  speakModel(s,it,(measured,spoke)=>{
     if(s.cancelled)return;
     const note=spoke?"":"（這個瀏覽器不能播放語音，請看上面的句子唸）";
-    if(!CAN_REC){
-      finishSession(s,"🙏 這個瀏覽器不支援錄音，可以先跟著唸幾次。建議用 iPhone 的 Safari 打開。"+note);
-      return;
-    }
-    const secs=Math.max(3,Math.min(12,dur*1.5+1));
-    startRecording(s,it,secs);
+    if(!CAN_REC){finishSession(s,"🙏 這個瀏覽器不支援錄音，可以先跟著唸幾次。建議用 iPhone 的 Safari 打開。"+note);return;}
+    startRecording(s,it,recWindow(modelTexts(it),measured));
   });
 }
-function finishSession(s,note){
-  s.timers.forEach(t=>{clearTimeout(t);clearInterval(t);});
+function finishSession(s,note,ok){
+  clearTimers(s);
   if(cur===s)cur=null;
-  const b=document.getElementById("sh-btn-"+s.id);
+  const b=document.getElementById("sh-btn-"+s.u);
   if(b){b.classList.remove("rec");b.textContent="🔊 跟讀";b.onclick=()=>shadow(s.dayId,s.id);}
-  const p=panel(s.id);if(p)p.innerHTML=shadowDoneHTML(s.dayId,s.id,note);
+  setPhase(panel(s.u),ok?"done":"warn",shadowDoneHTML(s.dayId,s.id,note));
 }
 const SILENT_PEAK=0.02;   // below this the whole recording was effectively silent
+const READY_MS=600;       // minimum length of the 準備 3-2-1 cue
 function startRecording(s,it,secs){
-  const p=panel(s.id);
-  p.innerHTML=`<div class="st">🎙️ 正在開啟麥克風…</div>`;
+  const readyAt=Date.now();
+  setPhase(panel(s.u),"ready",`<div class="st"><span class="ph" id="rd-${s.u}">準備… 3</span><span class="hint">紅燈亮就開始唸 · 這句錄 ${secs} 秒</span></div>${modelsHTML(it)}`);
+  let k=3;
+  s.timers.push(setInterval(()=>{k=Math.max(1,k-1);const el=document.getElementById("rd-"+s.u);if(el)el.textContent="準備… "+k;},READY_MS/3));
   freshMic().then(stream=>{
     if(s.cancelled)return;
     s.stream=stream;
@@ -389,35 +512,25 @@ function startRecording(s,it,secs){
       const lvl=s.meter?s.meter.stop():null;s.meter=null;
       if(s.discard)return;
       const bytes=s.chunks.reduce((n,c)=>n+c.size,0);
-      // Only trust the meter if it actually ran; otherwise fall back to the data size.
-      const silent=(lvl&&lvl.samples>=5)?lvl.peak<SILENT_PEAK:bytes<1500;
+      const silent=(lvl&&lvl.samples>=5)?lvl.peak<SILENT_PEAK:bytes<1500;   // trust the meter only if it ran
       if(!s.chunks.length||silent){
-        // Get a new capture now (holder is still live, so no prompt) so the next try works.
-        freshMic().catch(()=>{});
+        freshMic().catch(()=>{});   // new capture now (holder is live → no prompt) so the next try works
         finishSession(s,"🎙️ 剛剛沒錄到聲音，請按 🔁 再練一次");
         return;
       }
       const blob=new Blob(s.chunks,{type:rec.mimeType||mt||"audio/mp4"});
-      if(recordings[s.id])URL.revokeObjectURL(recordings[s.id]);
-      recordings[s.id]=URL.createObjectURL(blob);
-      finishSession(s,"👏 錄好了！聽聽看自己唸的，跟標準比一比。");
+      if(recordings[s.u])URL.revokeObjectURL(recordings[s.u]);
+      recordings[s.u]=URL.createObjectURL(blob);
+      finishSession(s,'<span class="ph">✅ 錄好了</span> 聽聽看自己唸的，跟標準比一比。',true);
+      quizMark(s.dayId,s.id,"practiced");
     };
-    const left=Math.round(secs);
-    p.innerHTML=`<div class="st"><span class="dot"></span><span class="turn">Your turn… 換你唸</span>
-        <span class="cd" id="cd-${s.id}">${left}s</span>
-        <button class="btn stop" id="stop-${s.id}">停止</button></div>
-      ${modelTexts(it).map(t=>`<div class="model">${esc(t)}</div>`).join("")}
-      <div class="tbar"><div id="tb-${s.id}"></div></div>`;
-    document.getElementById("stop-"+s.id).onclick=()=>stopRecording(s);
+    // Recorder must be running BEFORE the red state, so the first syllable isn't cut.
+    let went=false;
+    const go=()=>{if(went||s.cancelled)return;went=true;
+      s.timers.push(setTimeout(()=>beginRedPhase(s,it,secs),Math.max(0,READY_MS-(Date.now()-readyAt))));};
+    rec.onstart=go;
     try{rec.start(250);}catch(e){try{rec.start();}catch(e2){finishSession(s,"🎙️ 剛剛沒錄到聲音，請按 🔁 再練一次");return;}}
-    const t0=Date.now();
-    s.timers.push(setInterval(()=>{
-      const el=(Date.now()-t0)/1000,r=Math.max(0,secs-el);
-      const cd=document.getElementById("cd-"+s.id),tb=document.getElementById("tb-"+s.id);
-      if(cd)cd.textContent=Math.ceil(r)+"s";
-      if(tb)tb.style.width=(r/secs*100)+"%";
-    },200));
-    s.timers.push(setTimeout(()=>stopRecording(s),secs*1000));
+    s.timers.push(setTimeout(go,1200));   // fallback if 'start' never fires
   }).catch(err=>{
     if(s.cancelled)return;
     const denied=err&&(err.name==="NotAllowedError"||err.name==="SecurityError");
@@ -426,20 +539,40 @@ function startRecording(s,it,secs){
       :"🎙️ 打不開麥克風（"+esc(err&&err.name||"error")+"），請再試一次。");
   });
 }
+function beginRedPhase(s,it,secs){
+  if(s.cancelled)return;
+  clearTimers(s);   // ends the 3-2-1 ticker
+  const p=panel(s.u);
+  setPhase(p,"rec",`<div class="st"><span class="dot"></span><span class="turn">🔴 換你唸</span>
+      <span class="cd" id="cd-${s.u}">${secs.toFixed(1)}s</span>
+      <button class="btn stop" id="stop-${s.u}">停止</button></div>
+    ${modelsHTML(it)}
+    <div class="tbar"><div id="tb-${s.u}"></div></div>`);
+  const sb=document.getElementById("stop-"+s.u);if(sb)sb.onclick=()=>stopRecording(s);
+  const t0=Date.now(),tb=document.getElementById("tb-"+s.u);
+  if(tb){tb.style.transition="none";tb.style.width="100%";void tb.offsetWidth;
+    tb.style.transition=`width ${secs}s linear`;tb.style.width="0%";}   // bar runs exactly the window
+  s.timers.push(setInterval(()=>{
+    const r=Math.max(0,secs-(Date.now()-t0)/1000),cd=document.getElementById("cd-"+s.u);
+    if(cd)cd.textContent=r.toFixed(1)+"s";
+  },100));
+  s.timers.push(setTimeout(()=>stopRecording(s),secs*1000));
+}
 function stopRecording(s){
   if(s.cancelled||!s.rec||s.rec.state==="inactive")return;
-  s.timers.forEach(t=>{clearTimeout(t);clearInterval(t);});s.timers=[];
-  try{s.rec.stop();}catch(e){finishSession(s,"沒有錄到聲音，再試一次看看 🙂");}
+  clearTimers(s);
+  const cd=document.getElementById("cd-"+s.u);if(cd)cd.textContent="0.0s";
+  try{s.rec.stop();}catch(e){finishSession(s,"🎙️ 剛剛沒錄到聲音，請按 🔁 再練一次");}
 }
-function playMine(id){
-  const url=recordings[id];if(!url)return;
+function playMine(dayId,id){
+  const u=uid(dayId,id),url=recordings[u];if(!url)return;
   if(cur)stopShadow();
   if(TTS){try{TTS.cancel();}catch(e){}}
   if(!player){player=document.createElement("audio");player.setAttribute("playsinline","");player.preload="auto";document.body.appendChild(player);}
   stopPlayer();
   player.src=url;
   const pr=player.play();
-  if(pr&&pr.catch)pr.catch(()=>{const p=panel(id);if(p)p.insertAdjacentHTML("afterbegin",'<div class="hint">播放失敗，再按一次試試。</div>');});
+  if(pr&&pr.catch)pr.catch(()=>{const p=panel(u);if(p)p.insertAdjacentHTML("afterbegin",'<div class="hint">播放失敗，再按一次試試。</div>');});
 }
 function replayModel(dayId,id){
   const [d,it]=find(dayId,id);
