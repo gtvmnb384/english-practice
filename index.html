@@ -8,34 +8,34 @@
 :root{--bg:#fdf6ec;--card:#fff;--ink:#3b2f2a;--accent:#e07a5f;--accent2:#81b29a;--muted:#8a7b72;--line:#f0e2d0}
 *{box-sizing:border-box}
 body{margin:0;font-family:"Segoe UI",system-ui,-apple-system,"PingFang TC","Microsoft JhengHei",sans-serif;background:var(--bg);color:var(--ink);line-height:1.55}
-header{background:linear-gradient(135deg,#f2a07b,#e07a5f);color:#fff;padding:28px 20px 22px;text-align:center}
-header h1{margin:0;font-size:1.9rem}
+header{background:linear-gradient(135deg,#f2a07b,#e07a5f);color:#fff;padding:24px 20px 20px;text-align:center}
+header h1{margin:0;font-size:1.7rem}
 header p{margin:6px 0 0;opacity:.95}
-.wrap{max-width:860px;margin:0 auto;padding:18px}
-nav{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
-nav button{border:none;background:#fff;color:var(--ink);padding:8px 14px;border-radius:999px;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.08);font-size:.95rem}
+.wrap{max-width:860px;margin:0 auto;padding:16px}
+.card{background:var(--card);border-radius:14px;padding:16px 18px;margin:12px 0;box-shadow:0 2px 8px rgba(120,80,40,.07);border:1px solid var(--line)}
+.day{display:block;text-decoration:none;color:var(--ink);cursor:pointer}
+.day h2{margin:0 0 4px;font-size:1.25rem}
+.day .meta{color:var(--muted);font-size:.9rem}
+.bar{height:10px;background:#f3e6d6;border-radius:999px;overflow:hidden;margin-top:8px}
+.bar>div{height:100%;background:var(--accent2);transition:width .4s}
+nav{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+nav button,.back{border:none;background:#fff;color:var(--ink);padding:8px 14px;border-radius:999px;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.08);font-size:.95rem}
 nav button.on{background:var(--accent);color:#fff}
-.card{background:var(--card);border-radius:14px;padding:18px;margin:12px 0;box-shadow:0 2px 8px rgba(120,80,40,.07);border:1px solid var(--line)}
-.progress{background:#fff;border-radius:14px;padding:14px 18px;border:1px solid var(--line)}
-.bar{height:12px;background:#f3e6d6;border-radius:999px;overflow:hidden;margin-top:8px}
-.bar>div{height:100%;background:var(--accent2);width:0;transition:width .4s}
 .topic{font-size:.8rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
-.q{font-size:1.08rem;margin:6px 0 10px}
+.q{font-size:1.08rem;margin:6px 0 8px}
 .hint{font-size:.88rem;color:var(--muted)}
-input[type=text]{width:100%;padding:10px 12px;border:1px solid #e3d3bf;border-radius:10px;font-size:1rem;font-family:inherit}
+input[type=text]{width:100%;padding:10px 12px;border:1px solid #e3d3bf;border-radius:10px;font-size:1rem;font-family:inherit;margin-top:6px}
 .row{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
-.btn{border:none;background:var(--accent);color:#fff;padding:9px 16px;border-radius:10px;cursor:pointer;font-size:.95rem}
-.btn.mic{background:#81b29a}.btn.mic.rec{background:#c0392b}
+.btn{border:none;background:var(--accent);color:#fff;padding:9px 14px;border-radius:10px;cursor:pointer;font-size:.95rem}
+.btn.mic{background:var(--accent2)}.btn.mic.rec{background:#c0392b}
 .btn.ghost{background:#f3e6d6;color:var(--ink)}
 .fb{margin-top:10px;padding:10px 12px;border-radius:10px;display:none;font-size:.95rem}
 .fb.ok{background:#e6f3ec;color:#2f6b4f;display:block}
 .fb.no{background:#fdeae4;color:#9a3d22;display:block}
 .done-badge{float:right;background:var(--accent2);color:#fff;border-radius:999px;padding:2px 10px;font-size:.78rem}
-.phrase{display:flex;gap:14px;align-items:flex-start}
-.phrase b{color:var(--accent);font-size:1.1rem;white-space:nowrap}
-.blank{display:inline-block;min-width:70px;border-bottom:2px dashed var(--accent);margin:0 3px}
-footer{text-align:center;color:var(--muted);font-size:.85rem;padding:24px}
+.blank{display:inline-block;min-width:60px;border-bottom:2px dashed var(--accent);margin:0 3px}
 .hidden{display:none}
+footer{text-align:center;color:var(--muted);font-size:.85rem;padding:24px}
 </style>
 </head>
 <body>
@@ -43,135 +43,153 @@ footer{text-align:center;color:var(--muted);font-size:.85rem;padding:24px}
   <h1>☕ My English Practice</h1>
   <p>A little practice every day goes a long way. 加油！</p>
 </header>
-<div class="wrap">
-  <div class="progress">
-    <strong>Your progress</strong> <span id="ptext"></span>
-    <div class="bar"><div id="pbar"></div></div>
-    <div class="row"><button class="btn ghost" onclick="resetAll()">Reset progress</button></div>
-  </div>
-  <nav id="nav"></nav>
-  <div id="content"></div>
-</div>
-<footer>works offline · progress is saved in this browser only</footer>
-
+<div class="wrap" id="app"></div>
+<footer>Progress is saved in this browser only · 🎤 works in Safari and Chrome</footer>
 <script>
-const PHRASES=[
- {p:"popped into",m:"短暫進去一下（店、地方）",e:"I popped into the supermarket on my way home."},
- {p:"I'd probably say",m:"我大概會說……（委婉表達意見）",e:"I'd probably say beef noodle soup is my favorite."},
- {p:"eating out",m:"在外面吃、外食",e:"In Taiwan, eating out is cheap, so I rarely cook."},
- {p:"make soup noodles",m:"煮湯麵（用 make 比 cook 更自然）",e:"I made soup noodles in the hotel kitchen last night."},
- {p:"went into town",m:"進城、去市區",e:"I went into town this afternoon to look around."},
- {p:"I didn't really catch what it was about",m:"我沒聽懂／沒搞清楚那是關於什麼",e:"There was a demonstration, but I didn't really catch what it was about."}
-];
-
-// type: fill = fill in the blank; fix = correct the sentence
-const EX=[
- {id:"d1",t:"Going downtown",type:"fill",q:"Today I ___ ___ ___ to walk around the old square.",hint:"去市區（3 個字）",a:["went into town"],show:"Today I went into town to walk around the old square."},
- {id:"d2",t:"Going downtown",type:"fix",q:"Today I go to downtown with my friend.",hint:"時態 + downtown 前不用 to",a:["today i went downtown with my friend","today i went into town with my friend"],show:"Today I went downtown with my friend. / Today I went into town with my friend."},
- {id:"s1",t:"Supermarket shopping",type:"fill",q:"On the way back, I ___ ___ the supermarket to buy some eggs.",hint:"短暫進去一下（2 個字）",a:["popped into"],show:"On the way back, I popped into the supermarket to buy some eggs."},
- {id:"s2",t:"Supermarket shopping",type:"fix",q:"I go to supermarket and buy many vegetable.",hint:"時態、冠詞、複數",a:["i went to the supermarket and bought a lot of vegetables","i went to the supermarket and bought lots of vegetables","i went to the supermarket and bought many vegetables"],show:"I went to the supermarket and bought a lot of vegetables."},
- {id:"h1",t:"Cooking at the hotel",type:"fill",q:"There's a small kitchen in my hotel, so I ___ soup noodles for dinner.",hint:"煮湯麵用哪個動詞？（過去式）",a:["made"],show:"There's a small kitchen in my hotel, so I made soup noodles for dinner."},
- {id:"h2",t:"Cooking at the hotel",type:"fix",q:"I cook a soup noodle in the hotel.",hint:"make + soup noodles，時態",a:["i made soup noodles in the hotel","i made soup noodles at the hotel","i made some soup noodles at the hotel","i made some soup noodles in the hotel"],show:"I made soup noodles at the hotel."},
- {id:"e1",t:"Europe vs Taiwan",type:"fill",q:"In Taiwan, ___ ___ is really cheap, but in Europe I usually cook at home.",hint:"外食（2 個字）",a:["eating out"],show:"In Taiwan, eating out is really cheap, but in Europe I usually cook at home."},
- {id:"e2",t:"Europe vs Taiwan",type:"fix",q:"In Europe the restaurant is too expensive, so I must cook by myself in home.",hint:"泛指要用複數；at home",a:["in europe restaurants are too expensive, so i have to cook at home","in europe, restaurants are too expensive, so i have to cook at home","in europe restaurants are so expensive that i have to cook at home","in europe, eating out is too expensive, so i have to cook at home"],show:"In Europe, restaurants are too expensive, so I have to cook at home."},
- {id:"f1",t:"Favorite food in Taiwan",type:"fill",q:"If I had to pick one, ___ ___ ___ ___ beef noodle soup.",hint:"委婉說「我大概會說」（4 個字，含縮寫）",a:["i'd probably say","i’d probably say"],show:"If I had to pick one, I'd probably say beef noodle soup."},
- {id:"f2",t:"Favorite food in Taiwan",type:"fix",q:"My most favorite food in Taiwan is the hot pot.",hint:"favorite 本身就是最高級；hot pot 不用 the",a:["my favorite food in taiwan is hot pot"],show:"My favorite food in Taiwan is hot pot."},
- {id:"p1",t:"Hot pot",type:"fill",q:"In winter, my friends and I love to ___ hot pot together.",hint:"吃火鍋的常見動詞（have / eat 都可）",a:["have","eat"],show:"In winter, my friends and I love to have hot pot together."},
- {id:"p2",t:"Hot pot",type:"fix",q:"Hot pot is very popular in Taiwan, especially when the weather is cold, everyone like to eat it.",hint:"兩個子句要分開；everyone 是單數",a:["hot pot is very popular in taiwan, especially when the weather is cold. everyone likes it","hot pot is very popular in taiwan, especially when the weather is cold. everyone likes to eat it","hot pot is very popular in taiwan, especially when it's cold. everyone loves it"],show:"Hot pot is very popular in Taiwan, especially when the weather is cold. Everyone likes it."},
- {id:"m1",t:"Media freedom demonstration",type:"fill",q:"In the square there was a ___ about media freedom.",hint:"遊行、示威（一個字）",a:["demonstration","protest"],show:"In the square there was a demonstration about media freedom."},
- {id:"m2",t:"Media freedom demonstration",type:"fix",q:"I saw many people in the street for protest the media freedom.",hint:"protesting for... / a protest about...",a:["i saw a lot of people in the street protesting for media freedom","i saw many people in the street protesting for media freedom","i saw lots of people in the street protesting for media freedom"],show:"I saw a lot of people in the street protesting for media freedom."},
- {id:"c1",t:"Not understanding the demonstration",type:"fill",q:"Everyone was shouting in Czech, so I didn't really ___ what it was about.",hint:"聽懂、抓到（一個字）",a:["catch"],show:"Everyone was shouting in Czech, so I didn't really catch what it was about."},
- {id:"c2",t:"Not understanding the demonstration",type:"fix",q:"I don't understand what is the demonstration about.",hint:"間接問句語序 + 時態",a:["i didn't understand what the demonstration was about","i didn't really catch what the demonstration was about","i didn't really catch what it was about"],show:"I didn't really catch what the demonstration was about."},
- // fresh extras
- {id:"x1",t:"✨ Bonus: Work",type:"fix",q:"I am work as a part-time consultant until December.",hint:"am 和 work 不能同時用",a:["i work as a part-time consultant until december","i'm working as a part-time consultant until december","i am working as a part-time consultant until december"],show:"I'm working as a part-time consultant until December."},
- {id:"x2",t:"✨ Bonus: Weather",type:"fill",q:"It's getting really cold here. I need to ___ ___ a warmer jacket.",hint:"買到、入手（2 個字，pick ...）",a:["pick up"],show:"It's getting really cold here. I need to pick up a warmer jacket."},
- {id:"x3",t:"✨ Bonus: Transport",type:"fix",q:"I take the tram to arrive the city center.",hint:"get to / arrive in",a:["i take the tram to get to the city center","i took the tram to get to the city center","i take the tram to the city center","i took the tram to the city center"],show:"I take the tram to get to the city center."},
- {id:"x4",t:"✨ Bonus: Missing home",type:"fill",q:"Sometimes I really ___ Taiwanese night markets.",hint:"想念（一個字）",a:["miss"],show:"Sometimes I really miss Taiwanese night markets."},
- {id:"x5",t:"✨ Bonus: Small talk",type:"fix",q:"How long time you stay in Europe?",hint:"How long have you...",a:["how long have you been in europe","how long have you stayed in europe","how long are you staying in europe","how long will you stay in europe"],show:"How long have you been in Europe?"},
- {id:"x6",t:"✨ Bonus: Ordering food",type:"fill",q:"Could I ___ the soup of the day, please?",hint:"點餐常用（一個字）",a:["have","get"],show:"Could I have the soup of the day, please?"}
-];
-
-const KEY="jt-english-progress-v1";
-let done=JSON.parse(localStorage.getItem(KEY)||"{}");
-let view="all";
-
-function norm(s){return s.toLowerCase().replace(/[’]/g,"'").replace(/[.!?]+$/,"").replace(/\s+/g," ").replace(/\s*,\s*/g,", ").trim();}
-function save(){localStorage.setItem(KEY,JSON.stringify(done));updateProgress();}
-function updateProgress(){
-  const n=EX.filter(e=>done[e.id]).length;
-  document.getElementById("ptext").textContent=`— ${n} of ${EX.length} exercises done`;
-  document.getElementById("pbar").style.width=(n/EX.length*100)+"%";
+// ===== Data: one entry per practice day =====
+const DAYS=[
+{
+ id:"2026-11-03", label:"11/3 對話",
+ topics:"Going downtown · Supermarket · Soup noodles at the hotel · Cooking in Europe vs eating out in Taiwan · Favorite Taiwanese food · Hot pot · Media freedom demonstration",
+ vocab:[
+  {id:"v1",zh:"短暫進去一下（店裡）",w:["popped into","pop into"],show:"popped into",ex:"I popped into the supermarket on my way home."},
+  {id:"v2",zh:"我大概會說……",w:["i'd probably say","i would probably say"],show:"I'd probably say",ex:"I'd probably say beef noodle soup is my favorite."},
+  {id:"v3",zh:"外食、在外面吃",w:["eating out","eat out"],show:"eating out",ex:"In Taiwan, eating out is really cheap."},
+  {id:"v4",zh:"煮湯麵",w:["make soup noodles","made soup noodles"],show:"make soup noodles",ex:"I made soup noodles in the hotel kitchen."},
+  {id:"v5",zh:"進城、去市區",w:["went into town","go into town","go downtown","went downtown"],show:"went into town",ex:"I went into town this afternoon."},
+  {id:"v6",zh:"我沒聽懂那是關於什麼",w:["i didn't really catch what it was about","i didn't catch what it was about"],show:"I didn't really catch what it was about",ex:"There was a demonstration, but I didn't really catch what it was about."},
+  {id:"v7",zh:"超市",w:["supermarket"],show:"supermarket",ex:"There's a big supermarket near my hotel."},
+  {id:"v8",zh:"火鍋",w:["hot pot","hotpot"],show:"hot pot",ex:"Hot pot is perfect for cold weather."},
+  {id:"v9",zh:"遊行、示威",w:["demonstration","protest"],show:"demonstration",ex:"There was a demonstration in the main square."},
+  {id:"v10",zh:"新聞自由",w:["media freedom","press freedom","freedom of the press"],show:"media freedom",ex:"People were protesting for media freedom."},
+  {id:"v11",zh:"自己在家煮飯",w:["cook at home"],show:"cook at home",ex:"In Europe I usually cook at home."},
+  {id:"v12",zh:"想念",w:["miss"],show:"miss",ex:"Sometimes I really miss Taiwanese night markets."}
+ ],
+ sentences:[
+  {id:"d1",t:"Going downtown",type:"fill",q:"Today I ___ to walk around the old square.",hint:"去市區（3 個字）",a:["went into town"],show:"Today I went into town to walk around the old square."},
+  {id:"d2",t:"Going downtown",type:"fix",q:"Today I go to downtown with my friend.",hint:"時態，downtown 前不用 to",a:["today i went downtown with my friend","today i went into town with my friend"],show:"Today I went downtown with my friend."},
+  {id:"s1",t:"Supermarket shopping",type:"fill",q:"On the way back, I ___ the supermarket to buy some eggs.",hint:"短暫進去一下（2 個字）",a:["popped into"],show:"On the way back, I popped into the supermarket to buy some eggs."},
+  {id:"s2",t:"Supermarket shopping",type:"fix",q:"I go to supermarket and buy many vegetable.",hint:"時態、冠詞、複數",a:["i went to the supermarket and bought a lot of vegetables","i went to the supermarket and bought lots of vegetables","i went to the supermarket and bought many vegetables"],show:"I went to the supermarket and bought a lot of vegetables."},
+  {id:"h1",t:"Cooking at the hotel",type:"fill",q:"There's a small kitchen in my hotel, so I ___ soup noodles for dinner.",hint:"煮湯麵用哪個動詞？（過去式）",a:["made"],show:"There's a small kitchen in my hotel, so I made soup noodles for dinner."},
+  {id:"h2",t:"Cooking at the hotel",type:"fix",q:"I cook a soup noodle in the hotel.",hint:"make soup noodles，時態",a:["i made soup noodles in the hotel","i made soup noodles at the hotel","i made some soup noodles at the hotel","i made some soup noodles in the hotel"],show:"I made soup noodles at the hotel."},
+  {id:"e1",t:"Europe vs Taiwan",type:"fill",q:"In Taiwan, ___ is really cheap, but in Europe I usually cook at home.",hint:"外食（2 個字）",a:["eating out"],show:"In Taiwan, eating out is really cheap, but in Europe I usually cook at home."},
+  {id:"e2",t:"Europe vs Taiwan",type:"fix",q:"In Europe the restaurant is too expensive, so I must cook by myself in home.",hint:"泛指用複數；at home",a:["in europe restaurants are too expensive so i have to cook at home","in europe eating out is too expensive so i have to cook at home","in europe restaurants are so expensive that i have to cook at home"],show:"In Europe, restaurants are too expensive, so I have to cook at home."},
+  {id:"f1",t:"Favorite food in Taiwan",type:"fill",q:"If I had to pick one, ___ beef noodle soup.",hint:"委婉說「我大概會說」",a:["i'd probably say","i would probably say"],show:"If I had to pick one, I'd probably say beef noodle soup."},
+  {id:"f2",t:"Favorite food in Taiwan",type:"fix",q:"My most favorite food in Taiwan is the hot pot.",hint:"favorite 本身就是最高級；hot pot 不加 the",a:["my favorite food in taiwan is hot pot"],show:"My favorite food in Taiwan is hot pot."},
+  {id:"p1",t:"Hot pot",type:"fill",q:"In winter, my friends and I love to ___ hot pot together.",hint:"吃火鍋的常見動詞",a:["have","eat"],show:"In winter, my friends and I love to have hot pot together."},
+  {id:"p2",t:"Hot pot",type:"fix",q:"Hot pot is very popular in Taiwan, especially when the weather is cold, everyone like to eat it.",hint:"兩個子句分開；everyone 是單數",a:["hot pot is very popular in taiwan especially when the weather is cold everyone likes it","hot pot is very popular in taiwan especially when the weather is cold everyone likes to eat it"],show:"Hot pot is very popular in Taiwan, especially when the weather is cold. Everyone likes it."},
+  {id:"m1",t:"Media freedom demonstration",type:"fill",q:"In the square there was a ___ about media freedom.",hint:"遊行、示威（一個字）",a:["demonstration","protest"],show:"In the square there was a demonstration about media freedom."},
+  {id:"m2",t:"Media freedom demonstration",type:"fix",q:"I saw many people in the street for protest the media freedom.",hint:"protesting for ...",a:["i saw a lot of people in the street protesting for media freedom","i saw many people in the street protesting for media freedom","i saw lots of people in the street protesting for media freedom"],show:"I saw a lot of people in the street protesting for media freedom."},
+  {id:"c1",t:"Not understanding the demonstration",type:"fill",q:"Everyone was shouting in Czech, so I didn't really ___ what it was about.",hint:"聽懂、抓到（一個字）",a:["catch"],show:"Everyone was shouting in Czech, so I didn't really catch what it was about."},
+  {id:"c2",t:"Not understanding the demonstration",type:"fix",q:"I don't understand what is the demonstration about.",hint:"間接問句語序和時態",a:["i didn't understand what the demonstration was about","i didn't really catch what the demonstration was about","i didn't really catch what it was about"],show:"I didn't really catch what the demonstration was about."},
+  {id:"x1",t:"Bonus: Work",type:"fix",q:"I am work as a part-time consultant until December.",hint:"am 和 work 不能同時用",a:["i work as a part-time consultant until december","i'm working as a part-time consultant until december","i am working as a part-time consultant until december"],show:"I'm working as a part-time consultant until December."},
+  {id:"x2",t:"Bonus: Weather",type:"fill",q:"It's getting really cold here. I need to ___ a warmer jacket.",hint:"買到、入手（pick ...）",a:["pick up"],show:"It's getting really cold here. I need to pick up a warmer jacket."},
+  {id:"x3",t:"Bonus: Transport",type:"fix",q:"I take the tram to arrive the city center.",hint:"get to 或直接 to",a:["i take the tram to get to the city center","i took the tram to get to the city center","i take the tram to the city center","i took the tram to the city center"],show:"I take the tram to get to the city center."},
+  {id:"x4",t:"Bonus: Missing home",type:"fill",q:"Sometimes I really ___ Taiwanese night markets.",hint:"想念（一個字）",a:["miss"],show:"Sometimes I really miss Taiwanese night markets."},
+  {id:"x5",t:"Bonus: Small talk",type:"fix",q:"How long time you stay in Europe?",hint:"How long have you ...",a:["how long have you been in europe","how long have you stayed in europe","how long are you staying in europe","how long will you stay in europe"],show:"How long have you been in Europe?"},
+  {id:"x6",t:"Bonus: Ordering food",type:"fill",q:"Could I ___ the soup of the day, please?",hint:"點餐常用（一個字）",a:["have","get"],show:"Could I have the soup of the day, please?"}
+ ]
 }
-function resetAll(){if(confirm("Reset all progress?")){done={};save();render();}}
+];
 
-function check(id){
-  const e=EX.find(x=>x.id===id);
-  const v=norm(document.getElementById("in-"+id).value);
-  const fb=document.getElementById("fb-"+id);
-  if(!v){fb.className="fb no";fb.textContent="Type your answer first 🙂";return;}
-  const strip=x=>norm(x).replace(/[,.!?;:]/g,"").replace(/\s+/g," ").trim();
-  const ok=e.a.some(a=>strip(a)===strip(v))||strip(e.show)===strip(v);
-  if(ok){fb.className="fb ok";fb.innerHTML="✅ Nice! <br><b>"+e.show+"</b>";done[id]=true;save();
+// ===== State =====
+const KEY="english-progress-v2";
+let done={}; try{done=JSON.parse(localStorage.getItem(KEY)||"{}");}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(done));}catch(e){}}
+const app=document.getElementById("app");
+let tab="vocab";
+
+function norm(s){return s.toLowerCase().replace(/[’]/g,"'").replace(/[.,!?;:"“”]/g," ").replace(/\s+/g," ").trim();}
+function items(day){return day.vocab.map(v=>({...v,kind:"vocab"})).concat(day.sentences.map(s=>({...s,kind:"sent"})));}
+function key(day,id){return day.id+"/"+id;}
+function countDone(day,kind){return items(day).filter(i=>(!kind||i.kind===kind)&&done[key(day,i.id)]).length;}
+
+// ===== Views =====
+function route(){
+  const h=decodeURIComponent(location.hash.slice(1));
+  const day=DAYS.find(d=>d.id===h);
+  day?renderDay(day):renderHome();
+  window.scrollTo(0,0);
+}
+function renderHome(){
+  app.innerHTML='<h2 style="margin:8px 4px">練習日期</h2>'+DAYS.slice().reverse().map(d=>{
+    const total=items(d).length,n=countDone(d);
+    return `<a class="card day" href="#${d.id}"><h2>📅 ${d.label}</h2>
+      <div class="meta">${d.topics}</div>
+      <div class="meta">單字 ${countDone(d,"vocab")}/${d.vocab.length} · 語句 ${countDone(d,"sent")}/${d.sentences.length}</div>
+      <div class="bar"><div style="width:${n/total*100}%"></div></div></a>`;}).join("");
+}
+function renderDay(day){
+  const list=tab==="vocab"?day.vocab.map(v=>({...v,kind:"vocab"})):day.sentences.map(s=>({...s,kind:"sent"}));
+  const n=list.filter(i=>done[key(day,i.id)]).length;
+  let html=`<div class="row"><button class="back" onclick="location.hash=''">← 所有日期</button></div>
+  <h2 style="margin:12px 4px 0">📅 ${day.label}</h2>
+  <nav><button class="${tab==='vocab'?'on':''}" onclick="tab='vocab';renderDay(DAYS.find(d=>d.id==='${day.id}'))">單字 ${countDone(day,"vocab")}/${day.vocab.length}</button>
+  <button class="${tab==='sent'?'on':''}" onclick="tab='sent';renderDay(DAYS.find(d=>d.id==='${day.id}'))">語句練習 ${countDone(day,"sent")}/${day.sentences.length}</button></nav>
+  <div class="card"><strong>${tab==='vocab'?'單字':'語句練習'}進度</strong> — ${n} / ${list.length}
+  <div class="bar"><div style="width:${n/list.length*100}%"></div></div></div>`;
+  html+=list.map(it=>{
+    const k=key(day,it.id), isDone=done[k];
+    let head,q,ph;
+    if(it.kind==="vocab"){head="中文 → English";q=it.zh;ph="Type or speak the English";}
+    else{head=it.t+" · "+(it.type==="fill"?"Fill in the blank":"Fix the sentence");
+      q=it.type==="fill"?it.q.replace(/___/g,'<span class="blank"></span>'):"“"+it.q+"”";
+      ph=it.type==="fill"?"Type or speak the missing words":"Type or speak the corrected sentence";}
+    return `<div class="card">
+      <span id="badge-${it.id}" class="done-badge ${isDone?'':'hidden'}">done</span>
+      <div class="topic">${head}</div>
+      <div class="q">${q}</div>
+      ${it.hint?`<div class="hint">Hint: ${it.hint}</div>`:""}
+      <input type="text" id="in-${it.id}" placeholder="${ph}" onkeydown="if(event.key==='Enter')check('${day.id}','${it.id}')">
+      <div class="row">
+        <button class="btn" onclick="check('${day.id}','${it.id}')">Check</button>
+        <button class="btn mic" id="mic-${it.id}" onclick="listen('${day.id}','${it.id}')">🎤 Speak</button>
+        <button class="btn ghost" onclick="reveal('${day.id}','${it.id}')">Show answer</button>
+      </div>
+      <div class="fb" id="fb-${it.id}"></div></div>`;}).join("");
+  html+=`<div class="row"><button class="btn ghost" onclick="resetDay('${day.id}')">重設這一天的進度</button></div>`;
+  app.innerHTML=html;
+}
+
+// ===== Actions =====
+function find(dayId,id){const d=DAYS.find(x=>x.id===dayId);return [d,items(d).find(i=>i.id===id)];}
+function answerOf(it){return it.kind==="vocab"?it.w:it.a;}
+function shown(it){return it.kind==="vocab"?`<b>${it.show}</b><br><span class="hint">${it.ex}</span>`:`<b>${it.show}</b>`;}
+function check(dayId,id){
+  const [d,it]=find(dayId,id);
+  const v=norm(document.getElementById("in-"+id).value), fb=document.getElementById("fb-"+id);
+  if(!v){fb.className="fb no";fb.textContent="Type or speak your answer first 🙂";return false;}
+  const full=it.kind==="vocab"?norm(it.ex):norm(it.show);
+  const ok=answerOf(it).some(a=>norm(a)===v)||full===v;
+  if(ok){fb.className="fb ok";fb.innerHTML="✅ Nice!<br>"+shown(it);done[key(d,id)]=true;save();
     document.getElementById("badge-"+id).classList.remove("hidden");}
   else{fb.className="fb no";fb.innerHTML="Not quite. Try again, or tap “Show answer”.";}
+  return ok;
 }
-function reveal(id){
-  const e=EX.find(x=>x.id===id);const fb=document.getElementById("fb-"+id);
-  fb.className="fb ok";fb.innerHTML="💡 Suggested answer:<br><b>"+e.show+"</b>";
-}
-function toggleDone(id){done[id]=!done[id];save();render();}
+function reveal(dayId,id){const [d,it]=find(dayId,id);const fb=document.getElementById("fb-"+id);fb.className="fb ok";fb.innerHTML="💡 Answer:<br>"+shown(it);}
+function resetDay(dayId){if(!confirm("Reset progress for this day?"))return;Object.keys(done).forEach(k=>{if(k.startsWith(dayId+"/"))delete done[k];});save();route();}
 
-function renderNav(){
-  const tabs=[["all","All exercises"],["fill","Fill in the blank"],["fix","Fix the sentence"],["todo","Not done yet"],["phrases","Today's phrases"]];
-  document.getElementById("nav").innerHTML=tabs.map(([k,l])=>`<button class="${view===k?'on':''}" onclick="view='${k}';render()">${l}</button>`).join("");
-}
-function render(){
-  renderNav();
-  const c=document.getElementById("content");
-  if(view==="phrases"){
-    c.innerHTML=PHRASES.map(p=>`<div class="card phrase"><b>${p.p}</b><div><div>${p.m}</div><div class="hint">e.g. ${p.e}</div></div></div>`).join("");
-    return;
-  }
-  let list=EX;
-  if(view==="fill"||view==="fix")list=EX.filter(e=>e.type===view);
-  if(view==="todo")list=EX.filter(e=>!done[e.id]);
-  if(!list.length){c.innerHTML='<div class="card">🎉 Everything here is done. Great job!</div>';return;}
-  c.innerHTML=list.map(e=>{
-    const q=e.type==="fill"?e.q.replace(/___/g,'<span class="blank"></span>').replace(/(<span class="blank"><\/span>\s*)+/g,'<span class="blank"></span> '):"“"+e.q+"”";
-    const label=e.type==="fill"?"Fill in the blank":"Correct this sentence";
-    return `<div class="card">
-      <span id="badge-${e.id}" class="done-badge ${done[e.id]?'':'hidden'}">done</span>
-      <div class="topic">${e.t} · ${label}</div>
-      <div class="q">${q}</div>
-      <div class="hint">Hint: ${e.hint}</div>
-      <input type="text" id="in-${e.id}" placeholder="${e.type==='fill'?'Type the missing word(s)':'Type the corrected sentence'}" onkeydown="if(event.key==='Enter')check('${e.id}')">
-      <div class="row">
-        <button class="btn" onclick="check('${e.id}')">Check</button>
-        <button class="btn mic" id="mic-${e.id}" onclick="listen('${e.id}')">🎤 Speak</button>
-        <button class="btn ghost" onclick="reveal('${e.id}')">Show answer</button>
-        <button class="btn ghost" onclick="toggleDone('${e.id}')">${done[e.id]?'Mark as not done':'Mark as done'}</button>
-      </div>
-      <div class="fb" id="fb-${e.id}"></div>
-    </div>`;}).join("");
-}
-
+// ===== Voice input =====
 const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
 let rec=null;
-function listen(id){
+function listen(dayId,id){
   const fb=document.getElementById("fb-"+id);
-  if(!SR){fb.className="fb no";fb.textContent="Voice input isn't supported in this browser. Please try Safari or Chrome.";return;}
-  if(rec){try{rec.stop();}catch(e){} return;}
+  if(!SR){fb.className="fb no";fb.textContent="Voice input isn't supported in this browser. Please use Safari or Chrome.";return;}
+  if(rec){try{rec.stop();}catch(e){}return;}
   const btn=document.getElementById("mic-"+id);
-  rec=new SR(); rec.lang="en-US"; rec.interimResults=true; rec.maxAlternatives=1;
-  btn.classList.add("rec"); btn.textContent="⏹ Listening… tap to stop";
-  fb.className="fb ok"; fb.textContent="🎤 Listening… say your answer in English.";
-  let finalText="";
-  rec.onresult=(ev)=>{let t="";for(let i=0;i<ev.results.length;i++){t+=ev.results[i][0].transcript;}finalText=t;document.getElementById("in-"+id).value=t;};
-  rec.onerror=(ev)=>{fb.className="fb no";fb.textContent=ev.error==="not-allowed"?"Microphone permission was blocked. Allow the microphone for this site and try again.":"Couldn't hear you clearly ("+ev.error+"). Try again.";};
-  rec.onend=()=>{btn.classList.remove("rec");btn.textContent="🎤 Speak";rec=null;if(finalText.trim()){check(id);const f=document.getElementById("fb-"+id);f.innerHTML="You said: “"+finalText.trim()+"”<br>"+f.innerHTML;}};
-  try{rec.start();}catch(e){fb.className="fb no";fb.textContent="Couldn't start the microphone. Try again.";rec=null;btn.classList.remove("rec");btn.textContent="🎤 Speak";}
+  rec=new SR();rec.lang="en-US";rec.interimResults=true;rec.maxAlternatives=1;
+  btn.classList.add("rec");btn.textContent="⏹ Listening…";
+  fb.className="fb ok";fb.textContent="🎤 Listening… say your answer in English.";
+  let said="";
+  rec.onresult=ev=>{let t="";for(let i=0;i<ev.results.length;i++)t+=ev.results[i][0].transcript;said=t;document.getElementById("in-"+id).value=t;};
+  rec.onerror=ev=>{fb.className="fb no";fb.textContent=ev.error==="not-allowed"?"Microphone is blocked. Allow the microphone for this site and try again.":"Couldn't hear you clearly ("+ev.error+"). Try again.";};
+  rec.onend=()=>{btn.classList.remove("rec");btn.textContent="🎤 Speak";rec=null;
+    if(said.trim()){check(dayId,id);const f=document.getElementById("fb-"+id);f.innerHTML="You said: “"+said.trim()+"”<br>"+f.innerHTML;}};
+  try{rec.start();}catch(e){rec=null;btn.classList.remove("rec");btn.textContent="🎤 Speak";fb.className="fb no";fb.textContent="Couldn't start the microphone. Try again.";}
 }
-updateProgress();render();
+
+window.addEventListener("hashchange",route);
+route();
 </script>
 </body>
 </html>
