@@ -28,6 +28,18 @@ input[type=text]{width:100%;padding:10px 12px;border:1px solid #e3d3bf;border-ra
 .row{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
 .btn{border:none;background:var(--accent);color:#fff;padding:9px 14px;border-radius:10px;cursor:pointer;font-size:.95rem}
 .btn.mic{background:var(--accent2)}.btn.mic.rec{background:#c0392b}
+.shadow{margin-top:10px;padding:12px 14px;border-radius:12px;background:#fbf1e4;border:1px dashed #ecd2b4;font-size:.95rem}
+.shadow:empty{display:none}
+.shadow .model{font-weight:600;margin:4px 0 2px}
+.shadow .st{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.shadow .turn{color:#c0392b;font-weight:700;font-size:1.05rem}
+.shadow .cd{font-variant-numeric:tabular-nums;background:#fff;border-radius:999px;padding:1px 10px;font-weight:700;color:#c0392b}
+.dot{width:12px;height:12px;border-radius:50%;background:#c0392b;display:inline-block;animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.8)}}
+.tbar{height:6px;background:#f3d6cc;border-radius:999px;overflow:hidden;margin-top:8px}
+.tbar>div{height:100%;background:#c0392b;width:100%}
+.shadow .btn{font-size:.9rem;padding:8px 12px}
+.btn.stop{background:#c0392b}
 .btn.ghost{background:#f3e6d6;color:var(--ink)}
 .fb{margin-top:10px;padding:10px 12px;border-radius:10px;display:none;font-size:.95rem}
 .fb.ok{background:#e6f3ec;color:#2f6b4f;display:block}
@@ -44,7 +56,7 @@ footer{text-align:center;color:var(--muted);font-size:.85rem;padding:24px}
   <p>A little practice every day goes a long way. 加油！</p>
 </header>
 <div class="wrap" id="app"></div>
-<footer>Progress is saved in this browser only · 🎤 works in Safari and Chrome</footer>
+<footer>Progress is saved in this browser only · 🔊 跟讀：先聽標準發音，再錄自己的聲音</footer>
 <script>
 // ===== Data: one entry per practice day =====
 const DAYS=[
@@ -120,6 +132,7 @@ function renderHome(){
       <div class="bar"><div style="width:${n/total*100}%"></div></div></a>`;}).join("");
 }
 function renderDay(day){
+  stopShadow();
   const list=tab==="vocab"?day.vocab.map(v=>({...v,kind:"vocab"})):day.sentences.map(s=>({...s,kind:"sent"}));
   const n=list.filter(i=>done[key(day,i.id)]).length;
   let html=`<div class="row"><button class="back" onclick="location.hash=''">← 所有日期</button></div>
@@ -131,10 +144,10 @@ function renderDay(day){
   html+=list.map(it=>{
     const k=key(day,it.id), isDone=done[k];
     let head,q,ph;
-    if(it.kind==="vocab"){head="中文 → English";q=it.zh;ph="Type or speak the English";}
+    if(it.kind==="vocab"){head="中文 → English";q=it.zh;ph="Type the English";}
     else{head=it.t+" · "+(it.type==="fill"?"Fill in the blank":"Fix the sentence");
       q=it.type==="fill"?it.q.replace(/___/g,'<span class="blank"></span>'):"“"+it.q+"”";
-      ph=it.type==="fill"?"Type or speak the missing words":"Type or speak the corrected sentence";}
+      ph=it.type==="fill"?"Type the missing words":"Type the corrected sentence";}
     return `<div class="card">
       <span id="badge-${it.id}" class="done-badge ${isDone?'':'hidden'}">done</span>
       <div class="topic">${head}</div>
@@ -143,10 +156,11 @@ function renderDay(day){
       <input type="text" id="in-${it.id}" placeholder="${ph}" onkeydown="if(event.key==='Enter')check('${day.id}','${it.id}')">
       <div class="row">
         <button class="btn" onclick="check('${day.id}','${it.id}')">Check</button>
-        <button class="btn mic" id="mic-${it.id}" onclick="listen('${day.id}','${it.id}')">🎤 Speak</button>
+        <button class="btn mic" id="sh-btn-${it.id}" onclick="shadow('${day.id}','${it.id}')">🔊 跟讀</button>
         <button class="btn ghost" onclick="reveal('${day.id}','${it.id}')">Show answer</button>
       </div>
-      <div class="fb" id="fb-${it.id}"></div></div>`;}).join("");
+      <div class="fb" id="fb-${it.id}"></div>
+      <div class="shadow" id="sh-${it.id}">${shadowDoneHTML(day.id,it.id)}</div></div>`;}).join("");
   html+=`<div class="row"><button class="btn ghost" onclick="resetDay('${day.id}')">重設這一天的進度</button></div>`;
   app.innerHTML=html;
 }
@@ -158,7 +172,7 @@ function shown(it){return it.kind==="vocab"?`<b>${it.show}</b><br><span class="h
 function check(dayId,id){
   const [d,it]=find(dayId,id);
   const v=norm(document.getElementById("in-"+id).value), fb=document.getElementById("fb-"+id);
-  if(!v){fb.className="fb no";fb.textContent="Type or speak your answer first 🙂";return false;}
+  if(!v){fb.className="fb no";fb.textContent="Type your answer first 🙂";return false;}
   const full=it.kind==="vocab"?norm(it.ex):norm(it.show);
   const ok=answerOf(it).some(a=>norm(a)===v)||full===v;
   if(ok){fb.className="fb ok";fb.innerHTML="✅ Nice!<br>"+shown(it);done[key(d,id)]=true;save();
@@ -169,23 +183,170 @@ function check(dayId,id){
 function reveal(dayId,id){const [d,it]=find(dayId,id);const fb=document.getElementById("fb-"+id);fb.className="fb ok";fb.innerHTML="💡 Answer:<br>"+shown(it);}
 function resetDay(dayId){if(!confirm("Reset progress for this day?"))return;Object.keys(done).forEach(k=>{if(k.startsWith(dayId+"/"))delete done[k];});save();route();}
 
-// ===== Voice input =====
-const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-let rec=null;
-function listen(dayId,id){
-  const fb=document.getElementById("fb-"+id);
-  if(!SR){fb.className="fb no";fb.textContent="Voice input isn't supported in this browser. Please use Safari or Chrome.";return;}
-  if(rec){try{rec.stop();}catch(e){}return;}
-  const btn=document.getElementById("mic-"+id);
-  rec=new SR();rec.lang="en-US";rec.interimResults=true;rec.maxAlternatives=1;
-  btn.classList.add("rec");btn.textContent="⏹ Listening…";
-  fb.className="fb ok";fb.textContent="🎤 Listening… say your answer in English.";
-  let said="";
-  rec.onresult=ev=>{let t="";for(let i=0;i<ev.results.length;i++)t+=ev.results[i][0].transcript;said=t;document.getElementById("in-"+id).value=t;};
-  rec.onerror=ev=>{fb.className="fb no";fb.textContent=ev.error==="not-allowed"?"Microphone is blocked. Allow the microphone for this site and try again.":"Couldn't hear you clearly ("+ev.error+"). Try again.";};
-  rec.onend=()=>{btn.classList.remove("rec");btn.textContent="🎤 Speak";rec=null;
-    if(said.trim()){check(dayId,id);const f=document.getElementById("fb-"+id);f.innerHTML="You said: “"+said.trim()+"”<br>"+f.innerHTML;}};
-  try{rec.start();}catch(e){rec=null;btn.classList.remove("rec");btn.textContent="🎤 Speak";fb.className="fb no";fb.textContent="Couldn't start the microphone. Try again.";}
+// ===== Shadowing (跟讀) =====
+const TTS=window.speechSynthesis||null;
+const CAN_REC=!!(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia&&window.MediaRecorder);
+let enVoice=null;
+function pickVoice(){
+  if(!TTS)return;
+  const vs=TTS.getVoices()||[];
+  enVoice=vs.find(v=>v.lang==="en-US"&&/samantha|ava|allison|google us english/i.test(v.name))
+    ||vs.find(v=>v.lang==="en-US"||v.lang==="en_US")||vs.find(v=>/^en/i.test(v.lang))||null;
+}
+if(TTS){pickVoice();if("onvoiceschanged" in TTS)TTS.onvoiceschanged=pickVoice;}
+const recordings={};   // id -> blob URL of the user's last recording
+let cur=null;          // the one active session
+let keepUtts=[];       // keep utterances referenced (Safari GC bug)
+let player=null;       // shared <audio> for playback
+
+function modelTexts(it){return it.kind==="vocab"?[it.show].concat(it.ex?[it.ex]:[]):[it.show];}
+function esc(t){return String(t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
+function panel(id){return document.getElementById("sh-"+id);}
+function mimePick(){
+  if(!window.MediaRecorder||!MediaRecorder.isTypeSupported)return "";
+  for(const t of ["audio/mp4","audio/webm;codecs=opus","audio/webm"])if(MediaRecorder.isTypeSupported(t))return t;
+  return "";
+}
+function shadowDoneHTML(dayId,id,note){
+  const has=!!recordings[id];
+  if(!has&&!note)return "";
+  return `${note?`<div class="hint" style="margin-bottom:6px">${note}</div>`:""}
+    <div class="row" style="margin-top:0">
+      ${has?`<button class="btn mic" onclick="playMine('${id}')">▶️ 聽我的錄音</button>`:""}
+      <button class="btn ghost" onclick="replayModel('${dayId}','${id}')">🔊 再聽一次標準</button>
+      <button class="btn" onclick="shadow('${dayId}','${id}')">🔁 再練一次</button>
+    </div>`;
+}
+function stopPlayer(){if(player){try{player.pause();}catch(e){}}}
+function stopShadow(){
+  stopPlayer();
+  if(!cur)return;
+  const s=cur;cur=null;
+  s.cancelled=true;
+  s.timers.forEach(t=>{clearTimeout(t);clearInterval(t);});
+  if(TTS){try{TTS.cancel();}catch(e){}}
+  if(s.rec&&s.rec.state!=="inactive"){s.discard=true;try{s.rec.stop();}catch(e){}}
+  if(s.stream)s.stream.getTracks().forEach(t=>t.stop());
+  const b=document.getElementById("sh-btn-"+s.id);if(b){b.classList.remove("rec");b.textContent="🔊 跟讀";}
+  const p=panel(s.id);if(p)p.innerHTML=shadowDoneHTML(s.dayId,s.id);
+}
+// Speak the model; onDone(durationSeconds) is called once when finished.
+function speakModel(s,it,onDone){
+  const texts=modelTexts(it);
+  const words=texts.join(" ").split(/\s+/).length;
+  const est=words/2.5/0.9+0.6;     // rough estimate in seconds
+  if(!TTS||!window.SpeechSynthesisUtterance){onDone(est,false);return;}
+  try{TTS.cancel();}catch(e){}
+  let started=Date.now(),finished=false;
+  const finish=()=>{if(finished||s.cancelled)return;finished=true;
+    const d=(Date.now()-started)/1000;onDone(d>0.5?Math.min(d,est*3):est,true);};
+  keepUtts=texts.map((t,i)=>{
+    const u=new SpeechSynthesisUtterance(t);
+    u.lang="en-US";if(enVoice)u.voice=enVoice;u.rate=0.9;u.pitch=1;
+    if(i===0)u.onstart=()=>{started=Date.now();};
+    if(i===texts.length-1){u.onend=finish;u.onerror=finish;}
+    return u;
+  });
+  keepUtts.forEach(u=>TTS.speak(u));      // called inside the tap handler (iOS needs this)
+  // Safety net: some iOS versions don't fire onend
+  s.timers.push(setTimeout(finish,(est*2.2+4)*1000));
+}
+function shadow(dayId,id){
+  const [d,it]=find(dayId,id);
+  stopShadow();
+  const s={dayId,id,timers:[],cancelled:false,rec:null,stream:null,chunks:[]};
+  cur=s;
+  const p=panel(id),b=document.getElementById("sh-btn-"+id);
+  b.classList.add("rec");b.textContent="⏹ 停止";
+  b.onclick=()=>{ if(cur===s){stopShadow();} else shadow(dayId,id); };
+  p.innerHTML=`<div class="st">🔊 <b>Listen… 先聽標準發音</b></div>
+    ${modelTexts(it).map(t=>`<div class="model">${esc(t)}</div>`).join("")}`;
+  speakModel(s,it,(dur,spoke)=>{
+    if(s.cancelled)return;
+    const note=spoke?"":"（這個瀏覽器不能播放語音，請看上面的句子唸）";
+    if(!CAN_REC){
+      finishSession(s,"🙏 這個瀏覽器不支援錄音，可以先跟著唸幾次。建議用 iPhone 的 Safari 打開。"+note);
+      return;
+    }
+    const secs=Math.max(3,Math.min(12,dur*1.5+1));
+    startRecording(s,it,secs);
+  });
+}
+function finishSession(s,note){
+  s.timers.forEach(t=>{clearTimeout(t);clearInterval(t);});
+  if(s.stream)s.stream.getTracks().forEach(t=>t.stop());
+  if(cur===s)cur=null;
+  const b=document.getElementById("sh-btn-"+s.id);
+  if(b){b.classList.remove("rec");b.textContent="🔊 跟讀";b.onclick=()=>shadow(s.dayId,s.id);}
+  const p=panel(s.id);if(p)p.innerHTML=shadowDoneHTML(s.dayId,s.id,note);
+}
+function startRecording(s,it,secs){
+  const p=panel(s.id);
+  p.innerHTML=`<div class="st">🎙️ 正在開啟麥克風…</div>`;
+  navigator.mediaDevices.getUserMedia({audio:true}).then(stream=>{
+    if(s.cancelled){stream.getTracks().forEach(t=>t.stop());return;}
+    s.stream=stream;
+    const mt=mimePick();
+    let rec;
+    try{rec=mt?new MediaRecorder(stream,{mimeType:mt}):new MediaRecorder(stream);}
+    catch(e){try{rec=new MediaRecorder(stream);}catch(e2){finishSession(s,"🙏 這個瀏覽器不支援錄音，可以先跟著唸幾次。");return;}}
+    s.rec=rec;
+    rec.ondataavailable=e=>{if(e.data&&e.data.size)s.chunks.push(e.data);};
+    rec.onstop=()=>{
+      stream.getTracks().forEach(t=>t.stop());
+      if(s.discard||!s.chunks.length){if(!s.discard)finishSession(s,"沒有錄到聲音，再試一次看看 🙂");return;}
+      const blob=new Blob(s.chunks,{type:rec.mimeType||mt||"audio/mp4"});
+      if(recordings[s.id])URL.revokeObjectURL(recordings[s.id]);
+      recordings[s.id]=URL.createObjectURL(blob);
+      finishSession(s,"👏 錄好了！聽聽看自己唸的，跟標準比一比。");
+    };
+    const left=Math.round(secs);
+    p.innerHTML=`<div class="st"><span class="dot"></span><span class="turn">Your turn… 換你唸</span>
+        <span class="cd" id="cd-${s.id}">${left}s</span>
+        <button class="btn stop" id="stop-${s.id}">停止</button></div>
+      ${modelTexts(it).map(t=>`<div class="model">${esc(t)}</div>`).join("")}
+      <div class="tbar"><div id="tb-${s.id}"></div></div>`;
+    document.getElementById("stop-"+s.id).onclick=()=>stopRecording(s);
+    rec.start();
+    const t0=Date.now();
+    s.timers.push(setInterval(()=>{
+      const el=(Date.now()-t0)/1000,r=Math.max(0,secs-el);
+      const cd=document.getElementById("cd-"+s.id),tb=document.getElementById("tb-"+s.id);
+      if(cd)cd.textContent=Math.ceil(r)+"s";
+      if(tb)tb.style.width=(r/secs*100)+"%";
+    },200));
+    s.timers.push(setTimeout(()=>stopRecording(s),secs*1000));
+  }).catch(err=>{
+    if(s.cancelled)return;
+    const denied=err&&(err.name==="NotAllowedError"||err.name==="SecurityError");
+    finishSession(s,denied
+      ?"🎙️ 麥克風沒有被允許。請到 iPhone「設定 → Safari → 麥克風」改成「允許」，或在網址列左邊的「大小」選單允許麥克風，然後按 🔁 再練一次。"
+      :"🎙️ 打不開麥克風（"+esc(err&&err.name||"error")+"），請再試一次。");
+  });
+}
+function stopRecording(s){
+  if(s.cancelled||!s.rec||s.rec.state==="inactive")return;
+  s.timers.forEach(t=>{clearTimeout(t);clearInterval(t);});s.timers=[];
+  try{s.rec.stop();}catch(e){finishSession(s,"沒有錄到聲音，再試一次看看 🙂");}
+}
+function playMine(id){
+  const url=recordings[id];if(!url)return;
+  if(cur)stopShadow();
+  if(TTS){try{TTS.cancel();}catch(e){}}
+  if(!player){player=document.createElement("audio");player.setAttribute("playsinline","");player.preload="auto";document.body.appendChild(player);}
+  stopPlayer();
+  player.src=url;
+  const pr=player.play();
+  if(pr&&pr.catch)pr.catch(()=>{const p=panel(id);if(p)p.insertAdjacentHTML("afterbegin",'<div class="hint">播放失敗，再按一次試試。</div>');});
+}
+function replayModel(dayId,id){
+  const [d,it]=find(dayId,id);
+  if(cur)stopShadow();
+  stopPlayer();
+  if(!TTS||!window.SpeechSynthesisUtterance)return;
+  try{TTS.cancel();}catch(e){}
+  keepUtts=modelTexts(it).map(t=>{const u=new SpeechSynthesisUtterance(t);u.lang="en-US";if(enVoice)u.voice=enVoice;u.rate=0.9;return u;});
+  keepUtts.forEach(u=>TTS.speak(u));
 }
 
 window.addEventListener("hashchange",route);
