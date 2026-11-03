@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="app-version" content="2026-11-04a">
+<meta name="app-version" content="2026-11-04b">
 <title>My English Practice</title>
 <style>
 :root{--bg:#fdf6ec;--card:#fff;--ink:#3b2f2a;--accent:#e07a5f;--accent2:#81b29a;--muted:#8a7b72;--line:#f0e2d0}
@@ -63,7 +63,7 @@ footer{text-align:center;color:var(--muted);font-size:.85rem;padding:24px}
 <footer>Progress is saved in this browser only · 🔊 跟讀：先聽標準發音，再錄自己的聲音 · <span id="appver" style="opacity:.6"></span></footer>
 <script>
 // Bump BOTH this constant and the <meta name="app-version"> tag on every release.
-const APP_VERSION = "2026-11-04a";
+const APP_VERSION = "2026-11-04b";
 (function(){
   var el=document.getElementById('appver'); if(el) el.textContent='v'+APP_VERSION;
   var busy=false;
@@ -227,6 +227,34 @@ let cur=null;          // the one active session
 let keepUtts=[];       // keep utterances referenced (Safari GC bug)
 let player=null;       // shared <audio> for playback
 
+// ---- Mic stream: acquired once per app session and reused (avoids iOS re-prompting) ----
+let micStream=null,micPending=null,micReleaseTimer=null;
+function micAlive(st){return !!st&&st.getAudioTracks().some(t=>t.readyState==="live");}
+function micSetEnabled(on){if(micStream)micStream.getAudioTracks().forEach(t=>{t.enabled=on;});}
+function releaseMic(){
+  if(micReleaseTimer){clearTimeout(micReleaseTimer);micReleaseTimer=null;}
+  if(cur&&cur.rec&&cur.rec.state!=="inactive")return;   // never cut an active recording
+  if(micStream){micStream.getTracks().forEach(t=>{try{t.stop();}catch(e){}});}
+  micStream=null;
+}
+function getMic(){
+  if(micAlive(micStream)){micSetEnabled(true);return Promise.resolve(micStream);}
+  micStream=null;
+  if(micPending)return micPending;
+  micPending=navigator.mediaDevices.getUserMedia({audio:true}).then(st=>{
+    micPending=null;micStream=st;
+    st.getAudioTracks().forEach(t=>{t.addEventListener("ended",()=>{if(micStream===st&&!micAlive(st))micStream=null;});});
+    return st;
+  },err=>{micPending=null;throw err;});
+  return micPending;
+}
+document.addEventListener("visibilitychange",()=>{
+  if(document.visibilityState==="hidden"){
+    if(!micReleaseTimer&&micStream)micReleaseTimer=setTimeout(()=>{micReleaseTimer=null;releaseMic();},60000);
+  }else if(micReleaseTimer){clearTimeout(micReleaseTimer);micReleaseTimer=null;}
+});
+window.addEventListener("pagehide",()=>{if(cur)stopShadow();releaseMic();});
+
 function modelTexts(it){return it.kind==="vocab"?[it.show].concat(it.ex?[it.ex]:[]):[it.show];}
 function esc(t){return String(t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
 function panel(id){return document.getElementById("sh-"+id);}
@@ -254,7 +282,7 @@ function stopShadow(){
   s.timers.forEach(t=>{clearTimeout(t);clearInterval(t);});
   if(TTS){try{TTS.cancel();}catch(e){}}
   if(s.rec&&s.rec.state!=="inactive"){s.discard=true;try{s.rec.stop();}catch(e){}}
-  if(s.stream)s.stream.getTracks().forEach(t=>t.stop());
+  micSetEnabled(false);   // keep the stream (no re-prompt), just pause the track
   const b=document.getElementById("sh-btn-"+s.id);if(b){b.classList.remove("rec");b.textContent="🔊 跟讀";}
   const p=panel(s.id);if(p)p.innerHTML=shadowDoneHTML(s.dayId,s.id);
 }
@@ -302,7 +330,7 @@ function shadow(dayId,id){
 }
 function finishSession(s,note){
   s.timers.forEach(t=>{clearTimeout(t);clearInterval(t);});
-  if(s.stream)s.stream.getTracks().forEach(t=>t.stop());
+  micSetEnabled(false);   // keep the stream (no re-prompt), just pause the track
   if(cur===s)cur=null;
   const b=document.getElementById("sh-btn-"+s.id);
   if(b){b.classList.remove("rec");b.textContent="🔊 跟讀";b.onclick=()=>shadow(s.dayId,s.id);}
@@ -311,8 +339,8 @@ function finishSession(s,note){
 function startRecording(s,it,secs){
   const p=panel(s.id);
   p.innerHTML=`<div class="st">🎙️ 正在開啟麥克風…</div>`;
-  navigator.mediaDevices.getUserMedia({audio:true}).then(stream=>{
-    if(s.cancelled){stream.getTracks().forEach(t=>t.stop());return;}
+  getMic().then(stream=>{
+    if(s.cancelled){micSetEnabled(false);return;}
     s.stream=stream;
     const mt=mimePick();
     let rec;
@@ -321,7 +349,7 @@ function startRecording(s,it,secs){
     s.rec=rec;
     rec.ondataavailable=e=>{if(e.data&&e.data.size)s.chunks.push(e.data);};
     rec.onstop=()=>{
-      stream.getTracks().forEach(t=>t.stop());
+      if(!cur||cur===s)micSetEnabled(false);   // don't mute a newer round that already started
       if(s.discard||!s.chunks.length){if(!s.discard)finishSession(s,"沒有錄到聲音，再試一次看看 🙂");return;}
       const blob=new Blob(s.chunks,{type:rec.mimeType||mt||"audio/mp4"});
       if(recordings[s.id])URL.revokeObjectURL(recordings[s.id]);
