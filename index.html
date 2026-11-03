@@ -25,6 +25,7 @@ nav button.on{background:var(--accent);color:#fff}
 input[type=text]{width:100%;padding:10px 12px;border:1px solid #e3d3bf;border-radius:10px;font-size:1rem;font-family:inherit}
 .row{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
 .btn{border:none;background:var(--accent);color:#fff;padding:9px 16px;border-radius:10px;cursor:pointer;font-size:.95rem}
+.btn.mic{background:#81b29a}.btn.mic.rec{background:#c0392b}
 .btn.ghost{background:#f3e6d6;color:var(--ink)}
 .fb{margin-top:10px;padding:10px 12px;border-radius:10px;display:none;font-size:.95rem}
 .fb.ok{background:#e6f3ec;color:#2f6b4f;display:block}
@@ -108,7 +109,8 @@ function check(id){
   const v=norm(document.getElementById("in-"+id).value);
   const fb=document.getElementById("fb-"+id);
   if(!v){fb.className="fb no";fb.textContent="Type your answer first 🙂";return;}
-  const ok=e.a.some(a=>norm(a)===v||norm(a).replace(/,/g,"")===v.replace(/,/g,""));
+  const strip=x=>norm(x).replace(/[,.!?;:]/g,"").replace(/\s+/g," ").trim();
+  const ok=e.a.some(a=>strip(a)===strip(v))||strip(e.show)===strip(v);
   if(ok){fb.className="fb ok";fb.innerHTML="✅ Nice! <br><b>"+e.show+"</b>";done[id]=true;save();
     document.getElementById("badge-"+id).classList.remove("hidden");}
   else{fb.className="fb no";fb.innerHTML="Not quite. Try again, or tap “Show answer”.";}
@@ -145,11 +147,29 @@ function render(){
       <input type="text" id="in-${e.id}" placeholder="${e.type==='fill'?'Type the missing word(s)':'Type the corrected sentence'}" onkeydown="if(event.key==='Enter')check('${e.id}')">
       <div class="row">
         <button class="btn" onclick="check('${e.id}')">Check</button>
+        <button class="btn mic" id="mic-${e.id}" onclick="listen('${e.id}')">🎤 Speak</button>
         <button class="btn ghost" onclick="reveal('${e.id}')">Show answer</button>
         <button class="btn ghost" onclick="toggleDone('${e.id}')">${done[e.id]?'Mark as not done':'Mark as done'}</button>
       </div>
       <div class="fb" id="fb-${e.id}"></div>
     </div>`;}).join("");
+}
+
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+let rec=null;
+function listen(id){
+  const fb=document.getElementById("fb-"+id);
+  if(!SR){fb.className="fb no";fb.textContent="Voice input isn't supported in this browser. Please try Safari or Chrome.";return;}
+  if(rec){try{rec.stop();}catch(e){} return;}
+  const btn=document.getElementById("mic-"+id);
+  rec=new SR(); rec.lang="en-US"; rec.interimResults=true; rec.maxAlternatives=1;
+  btn.classList.add("rec"); btn.textContent="⏹ Listening… tap to stop";
+  fb.className="fb ok"; fb.textContent="🎤 Listening… say your answer in English.";
+  let finalText="";
+  rec.onresult=(ev)=>{let t="";for(let i=0;i<ev.results.length;i++){t+=ev.results[i][0].transcript;}finalText=t;document.getElementById("in-"+id).value=t;};
+  rec.onerror=(ev)=>{fb.className="fb no";fb.textContent=ev.error==="not-allowed"?"Microphone permission was blocked. Allow the microphone for this site and try again.":"Couldn't hear you clearly ("+ev.error+"). Try again.";};
+  rec.onend=()=>{btn.classList.remove("rec");btn.textContent="🎤 Speak";rec=null;if(finalText.trim()){check(id);const f=document.getElementById("fb-"+id);f.innerHTML="You said: “"+finalText.trim()+"”<br>"+f.innerHTML;}};
+  try{rec.start();}catch(e){fb.className="fb no";fb.textContent="Couldn't start the microphone. Try again.";rec=null;btn.classList.remove("rec");btn.textContent="🎤 Speak";}
 }
 updateProgress();render();
 </script>
