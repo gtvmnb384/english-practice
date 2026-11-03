@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="app-version" content="2026-11-04b">
+<meta name="app-version" content="2026-11-04c">
 <title>My English Practice</title>
 <style>
 :root{--bg:#fdf6ec;--card:#fff;--ink:#3b2f2a;--accent:#e07a5f;--accent2:#81b29a;--muted:#8a7b72;--line:#f0e2d0}
@@ -63,7 +63,7 @@ footer{text-align:center;color:var(--muted);font-size:.85rem;padding:24px}
 <footer>Progress is saved in this browser only · 🔊 跟讀：先聽標準發音，再錄自己的聲音 · <span id="appver" style="opacity:.6"></span></footer>
 <script>
 // Bump BOTH this constant and the <meta name="app-version"> tag on every release.
-const APP_VERSION = "2026-11-04b";
+const APP_VERSION = "2026-11-04c";
 (function(){
   var el=document.getElementById('appver'); if(el) el.textContent='v'+APP_VERSION;
   var busy=false;
@@ -227,23 +227,27 @@ let cur=null;          // the one active session
 let keepUtts=[];       // keep utterances referenced (Safari GC bug)
 let player=null;       // shared <audio> for playback
 
-// ---- Mic stream: acquired once per app session and reused (avoids iOS re-prompting) ----
+// ---- Mic: one permission prompt per app session, but a FRESH capture for every recording ----
+// micStream is the "permission holder": while a live stream exists, iOS doesn't re-prompt.
+// Each round calls getUserMedia again (no prompt, because the holder is live), records with the
+// new stream, then that new stream becomes the holder and the previous one is stopped.
+// This avoids iOS's silent/muted track after speechSynthesis or <audio> changes the audio session.
 let micStream=null,micPending=null,micReleaseTimer=null;
-function micAlive(st){return !!st&&st.getAudioTracks().some(t=>t.readyState==="live");}
-function micSetEnabled(on){if(micStream)micStream.getAudioTracks().forEach(t=>{t.enabled=on;});}
+function micLive(st){return !!st&&st.getAudioTracks().some(t=>t.readyState==="live"&&!t.muted);}
+function stopStream(st){if(st)st.getTracks().forEach(t=>{try{t.stop();}catch(e){}});}
 function releaseMic(){
   if(micReleaseTimer){clearTimeout(micReleaseTimer);micReleaseTimer=null;}
   if(cur&&cur.rec&&cur.rec.state!=="inactive")return;   // never cut an active recording
-  if(micStream){micStream.getTracks().forEach(t=>{try{t.stop();}catch(e){}});}
-  micStream=null;
+  stopStream(micStream);micStream=null;
 }
-function getMic(){
-  if(micAlive(micStream)){micSetEnabled(true);return Promise.resolve(micStream);}
-  micStream=null;
+// Returns a brand-new stream for this round and makes it the holder.
+function freshMic(){
   if(micPending)return micPending;
+  const old=micStream;
   micPending=navigator.mediaDevices.getUserMedia({audio:true}).then(st=>{
-    micPending=null;micStream=st;
-    st.getAudioTracks().forEach(t=>{t.addEventListener("ended",()=>{if(micStream===st&&!micAlive(st))micStream=null;});});
+    micPending=null;
+    micStream=st;
+    if(old&&old!==st)stopStream(old);    // stop the old holder only after the new one is live
     return st;
   },err=>{micPending=null;throw err;});
   return micPending;
@@ -254,6 +258,37 @@ document.addEventListener("visibilitychange",()=>{
   }else if(micReleaseTimer){clearTimeout(micReleaseTimer);micReleaseTimer=null;}
 });
 window.addEventListener("pagehide",()=>{if(cur)stopShadow();releaseMic();});
+
+// ---- Level meter (safety net for silent recordings) ----
+let actx=null;
+function ensureAudioCtx(){   // call inside the user's tap so iOS allows it
+  try{
+    const AC=window.AudioContext||window.webkitAudioContext;
+    if(!AC)return null;
+    if(!actx||actx.state==="closed")actx=new AC();
+    if(actx.state==="suspended"&&actx.resume)actx.resume().catch(()=>{});
+    return actx;
+  }catch(e){return null;}
+}
+// Returns {stop():{peak,samples}} measuring peak deviation from silence (0..1).
+function startMeter(stream){
+  const m={peak:0,samples:0,src:null,an:null,iv:null};
+  try{
+    const ctx=ensureAudioCtx();
+    if(!ctx)return null;
+    m.src=ctx.createMediaStreamSource(stream);
+    m.an=ctx.createAnalyser();m.an.fftSize=1024;
+    m.src.connect(m.an);
+    const buf=new Float32Array(m.an.fftSize);
+    m.iv=setInterval(()=>{
+      if(ctx.state!=="running")return;
+      m.an.getFloatTimeDomainData(buf);
+      let pk=0;for(let i=0;i<buf.length;i++){const v=Math.abs(buf[i]);if(v>pk)pk=v;}
+      m.samples++;if(pk>m.peak)m.peak=pk;
+    },50);
+  }catch(e){return null;}
+  return {stop(){clearInterval(m.iv);try{m.src&&m.src.disconnect();}catch(e){}return {peak:m.peak,samples:m.samples};}};
+}
 
 function modelTexts(it){return it.kind==="vocab"?[it.show].concat(it.ex?[it.ex]:[]):[it.show];}
 function esc(t){return String(t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
@@ -282,7 +317,7 @@ function stopShadow(){
   s.timers.forEach(t=>{clearTimeout(t);clearInterval(t);});
   if(TTS){try{TTS.cancel();}catch(e){}}
   if(s.rec&&s.rec.state!=="inactive"){s.discard=true;try{s.rec.stop();}catch(e){}}
-  micSetEnabled(false);   // keep the stream (no re-prompt), just pause the track
+  if(s.meter){try{s.meter.stop();}catch(e){}s.meter=null;}
   const b=document.getElementById("sh-btn-"+s.id);if(b){b.classList.remove("rec");b.textContent="🔊 跟讀";}
   const p=panel(s.id);if(p)p.innerHTML=shadowDoneHTML(s.dayId,s.id);
 }
@@ -312,6 +347,7 @@ function shadow(dayId,id){
   stopShadow();
   const s={dayId,id,timers:[],cancelled:false,rec:null,stream:null,chunks:[]};
   cur=s;
+  ensureAudioCtx();   // create/resume inside the tap (iOS)
   const p=panel(id),b=document.getElementById("sh-btn-"+id);
   b.classList.add("rec");b.textContent="⏹ 停止";
   b.onclick=()=>{ if(cur===s){stopShadow();} else shadow(dayId,id); };
@@ -330,27 +366,37 @@ function shadow(dayId,id){
 }
 function finishSession(s,note){
   s.timers.forEach(t=>{clearTimeout(t);clearInterval(t);});
-  micSetEnabled(false);   // keep the stream (no re-prompt), just pause the track
   if(cur===s)cur=null;
   const b=document.getElementById("sh-btn-"+s.id);
   if(b){b.classList.remove("rec");b.textContent="🔊 跟讀";b.onclick=()=>shadow(s.dayId,s.id);}
   const p=panel(s.id);if(p)p.innerHTML=shadowDoneHTML(s.dayId,s.id,note);
 }
+const SILENT_PEAK=0.02;   // below this the whole recording was effectively silent
 function startRecording(s,it,secs){
   const p=panel(s.id);
   p.innerHTML=`<div class="st">🎙️ 正在開啟麥克風…</div>`;
-  getMic().then(stream=>{
-    if(s.cancelled){micSetEnabled(false);return;}
+  freshMic().then(stream=>{
+    if(s.cancelled)return;
     s.stream=stream;
     const mt=mimePick();
     let rec;
     try{rec=mt?new MediaRecorder(stream,{mimeType:mt}):new MediaRecorder(stream);}
     catch(e){try{rec=new MediaRecorder(stream);}catch(e2){finishSession(s,"🙏 這個瀏覽器不支援錄音，可以先跟著唸幾次。");return;}}
     s.rec=rec;
-    rec.ondataavailable=e=>{if(e.data&&e.data.size)s.chunks.push(e.data);};
+    s.meter=startMeter(stream);
+    rec.ondataavailable=e=>{if(e.data&&e.data.size>0)s.chunks.push(e.data);};
     rec.onstop=()=>{
-      if(!cur||cur===s)micSetEnabled(false);   // don't mute a newer round that already started
-      if(s.discard||!s.chunks.length){if(!s.discard)finishSession(s,"沒有錄到聲音，再試一次看看 🙂");return;}
+      const lvl=s.meter?s.meter.stop():null;s.meter=null;
+      if(s.discard)return;
+      const bytes=s.chunks.reduce((n,c)=>n+c.size,0);
+      // Only trust the meter if it actually ran; otherwise fall back to the data size.
+      const silent=(lvl&&lvl.samples>=5)?lvl.peak<SILENT_PEAK:bytes<1500;
+      if(!s.chunks.length||silent){
+        // Get a new capture now (holder is still live, so no prompt) so the next try works.
+        freshMic().catch(()=>{});
+        finishSession(s,"🎙️ 剛剛沒錄到聲音，請按 🔁 再練一次");
+        return;
+      }
       const blob=new Blob(s.chunks,{type:rec.mimeType||mt||"audio/mp4"});
       if(recordings[s.id])URL.revokeObjectURL(recordings[s.id]);
       recordings[s.id]=URL.createObjectURL(blob);
@@ -363,7 +409,7 @@ function startRecording(s,it,secs){
       ${modelTexts(it).map(t=>`<div class="model">${esc(t)}</div>`).join("")}
       <div class="tbar"><div id="tb-${s.id}"></div></div>`;
     document.getElementById("stop-"+s.id).onclick=()=>stopRecording(s);
-    rec.start();
+    try{rec.start(250);}catch(e){try{rec.start();}catch(e2){finishSession(s,"🎙️ 剛剛沒錄到聲音，請按 🔁 再練一次");return;}}
     const t0=Date.now();
     s.timers.push(setInterval(()=>{
       const el=(Date.now()-t0)/1000,r=Math.max(0,secs-el);
