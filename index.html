@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="app-version" content="2026-11-04f">
+<meta name="app-version" content="2026-11-04g">
 <title>My English Practice</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -39,7 +39,9 @@ button,input{font:inherit;color:inherit}
 /* floating pill bar */
 .topbar{position:sticky;top:10px;z-index:40;display:flex;justify-content:space-between;align-items:center;gap:10px;margin:10px 12px 0;pointer-events:none}
 .topbar>*{pointer-events:auto}
-.brand{display:inline-flex;align-items:center;gap:10px;min-height:46px;padding:6px 18px 6px 8px;border-radius:var(--pill);background:rgba(255,255,255,.82);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:var(--shadow);text-decoration:none;color:var(--ink);font-family:var(--f-display);font-weight:500;font-size:17px;letter-spacing:-.01em}
+.topbar{transition:transform .55s var(--ease)}
+.topbar[data-hidden]{transform:translateY(calc(-100% - 24px))}
+.brand{display:inline-flex;align-items:center;gap:10px;min-height:46px;padding:6px 18px 6px 8px;border-radius:var(--pill);background:rgba(255,255,255,.96);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:var(--shadow);text-decoration:none;color:var(--ink);font-family:var(--f-display);font-weight:500;font-size:17px;letter-spacing:-.01em}
 .mark{width:32px;height:32px;border-radius:50%;background:linear-gradient(180deg,var(--ember) 0 48%,var(--ink) 48%);display:grid;place-items:center;color:#fff;font-size:15px}
 .pillbtn{display:inline-flex;align-items:center;gap:10px;min-height:46px;padding:6px 6px 6px 18px;border:0;border-radius:var(--pill);background:var(--ink);color:#fff;font-weight:500;font-size:15px;cursor:pointer;box-shadow:var(--shadow);text-decoration:none}
 .disc{width:34px;height:34px;border-radius:50%;background:var(--ember);color:var(--night);display:grid;place-items:center;flex:none;transition:transform .5s var(--ease)}
@@ -64,11 +66,11 @@ button,input{font:inherit;color:inherit}
 .hero .sub{position:relative;z-index:1;margin:0;max-width:30ch;color:#e9ebfa;font-size:16px}
 .chips{position:relative;z-index:1;display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
 .chip{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:var(--pill);background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);font-size:13px;font-weight:500}
-body[data-view="day"] .hero-window,body[data-view="quiz"] .hero-window{min-height:0;padding:72px 20px 16px}
-body[data-view="day"] .hero h1,body[data-view="quiz"] .hero h1{font-size:28px;margin:0}
-body[data-view="day"] .hero .ln,body[data-view="quiz"] .hero .ln{display:inline}
-body[data-view="day"] .hero .eyebrow,body[data-view="quiz"] .hero .eyebrow{display:none}
-body[data-view="day"] .hero .sub,body[data-view="day"] .chips,body[data-view="quiz"] .hero .sub,body[data-view="quiz"] .chips{display:none}
+body[data-view="day"] .hero-window,body[data-view="quiz"] .hero-window,body[data-view="words"] .hero-window{min-height:0;padding:72px 20px 16px}
+body[data-view="day"] .hero h1,body[data-view="quiz"] .hero h1,body[data-view="words"] .hero h1{font-size:28px;margin:0}
+body[data-view="day"] .hero .ln,body[data-view="quiz"] .hero .ln,body[data-view="words"] .hero .ln{display:inline}
+body[data-view="day"] .hero .eyebrow,body[data-view="quiz"] .hero .eyebrow,body[data-view="words"] .hero .eyebrow{display:none}
+body[data-view="day"] .hero .sub,body[data-view="day"] .chips,body[data-view="words"] .hero .sub,body[data-view="words"] .chips,body[data-view="quiz"] .hero .sub,body[data-view="quiz"] .chips{display:none}
 .hero{margin-top:-56px}
 
 .wrap{max-width:760px;margin:0 auto;padding:6px 14px 20px}
@@ -161,6 +163,33 @@ input[type=text]:focus{outline:none;border-color:var(--ink);background:#fff}
 .summary .row{justify-content:center}
 .blank{display:inline-block;min-width:64px;border-bottom:2.5px solid var(--ember);margin:0 4px}
 .hidden{display:none}
+.tbend{display:flex;gap:8px}
+.pillbtn.sm{padding:6px 16px}
+.pillbtn.light{background:rgba(255,255,255,.96);color:var(--ink);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+.wordsbtn{text-decoration:none;margin-top:12px;background:radial-gradient(80% 90% at 100% 100%,rgba(231,182,203,.6),transparent 60%),linear-gradient(135deg,var(--blue),var(--ink))}
+.wordsbtn b{color:#fff}
+.wds{display:inline}
+.wd{cursor:pointer;border-radius:6px;padding:0 1px;margin:0 -1px;-webkit-tap-highlight-color:transparent;transition:background .25s,box-shadow .25s,color .25s;-webkit-user-select:none;user-select:none}
+.wd:hover{background:rgba(50,61,128,.08)}
+.wd.on{background:linear-gradient(180deg,transparent 38%,rgba(242,120,63,.42) 38%);color:#7a2d0c;box-shadow:inset 0 -2px 0 var(--ember)}
+.wd.hl{font-weight:700}
+.wd.pop{animation:wpop .42s var(--ease)}
+@keyframes wpop{0%{transform:scale(1)}40%{transform:scale(1.18)}100%{transform:scale(1)}}
+.wd{display:inline-block}
+.tiphint{margin-top:10px;padding:8px 12px;border-radius:12px;background:#fff1e9;color:#8a3a12;font-size:14px;font-weight:500}
+.wcard .wword{font-family:var(--f-display);font-weight:500;font-size:40px;line-height:1.05;letter-spacing:-.02em;padding-right:100px;word-break:break-word}
+.wcard.big{text-align:center;padding:28px 20px}
+.wcard.big .wword{font-size:56px;padding:18px 0 6px}
+.wcard.big .row{justify-content:center}
+.btn.wbig{min-height:56px;font-size:18px;padding:12px 26px}
+.wsent{display:flex;gap:10px;align-items:flex-start;margin-top:14px;padding:12px 14px;border-radius:16px;background:var(--ground);text-align:left;font-size:16px;line-height:1.55}
+.sentplay{flex:none;width:40px;height:40px;border:0;border-radius:50%;background:var(--ink);color:#fff;font-size:14px;cursor:pointer}
+.wfoot{justify-content:space-between;align-items:center}
+.wcard.big .wfoot{justify-content:center}
+.mastered summary{cursor:pointer;font-family:var(--f-display);font-weight:500;font-size:19px;min-height:30px}
+.mastered .wcard{box-shadow:none;border:1px solid var(--line)}
+.empty{text-align:center}
+.ans{font-weight:600}
 .rv{opacity:0;transform:translateY(26px)}
 .rv.in{opacity:1;transform:none;transition:opacity .8s var(--ease),transform .8s var(--ease)}
 
@@ -173,15 +202,15 @@ footer .wordmark{font-family:var(--f-display);font-weight:500;font-size:22vw;lin
 </head>
 <body>
 <div class="topbar">
-  <a class="brand" href="#" onclick="location.hash='';return false;"><span class="mark">☕</span>My English</a>
-  <button class="pillbtn" onclick="startQuiz()">🎲 測驗<span class="disc"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></button>
+  <a class="brand" href="#" onclick="location.hash='';return false;"><span class="mark">☕</span>English</a>
+  <div class="tbend"><a class="pillbtn sm light" href="#words">📒 單字</a><button class="pillbtn sm" onclick="startQuiz()">🎲 測驗</button></div>
 </div>
 <header class="hero">
   <div class="hero-window">
     <span class="eyebrow">Daily speaking practice · 每日英文</span>
     <h1><span class="ln"><span class="w">My</span> <span class="w">English</span></span> <span class="ln"><span class="w">Practice</span></span></h1>
     <p class="sub">A little practice every day goes a long way. 加油！</p>
-    <div class="chips"><span class="chip">🔊 跟讀</span><span class="chip">✅ 每日任務</span><span class="chip">🎲 隨機測驗</span></div>
+    <div class="chips"><span class="chip">🔊 跟讀</span><span class="chip">✅ 每日任務</span><span class="chip">📒 單字本</span><span class="chip">🎲 隨機測驗</span></div>
   </div>
 </header>
 <div class="wrap" id="app"></div>
@@ -189,7 +218,7 @@ footer .wordmark{font-family:var(--f-display);font-weight:500;font-size:22vw;lin
 <script defer src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
 <script>
 // Bump BOTH this constant and the <meta name="app-version"> tag on every release.
-const APP_VERSION = "2026-11-04f";
+const APP_VERSION = "2026-11-04g";
 (function(){
   var el=document.getElementById('appver'); if(el) el.textContent='v'+APP_VERSION;
   var busy=false;
@@ -291,6 +320,12 @@ const Motion=(function(){
   function pop(el){const G=g();if(G&&el)G.fromTo(el,{scale:.92},{scale:1,duration:.5,ease:"back.out(2.5)",clearProps:"transform"});}
   return {intro,view,pop,routed(){if(introDone)view();}};
 })();
+// Floating bar: slides away on scroll down, returns on scroll up (passive, rAF-throttled).
+(function(){let lastY=window.scrollY||0,ticking=false;
+  window.addEventListener("scroll",()=>{if(ticking)return;ticking=true;requestAnimationFrame(()=>{ticking=false;
+    const y=window.scrollY||0,bar=document.querySelector(".topbar");if(!bar)return;
+    if(y>90&&y>lastY+4)bar.setAttribute("data-hidden","");else if(y<lastY-4||y<=90)bar.removeAttribute("data-hidden");
+    lastY=y;});},{passive:true});})();
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",()=>Motion.intro());else setTimeout(()=>Motion.intro(),0);
 
 // ===== State =====
@@ -309,18 +344,20 @@ let view="home";
 let quiz=null;   // {list:[{dayId,id}], res:{uid:"ok"|"shown"|"practiced"}}
 
 function norm(s){return s.toLowerCase().replace(/[’]/g,"'").replace(/[.,!?;:"“”]/g," ").replace(/\s+/g," ").trim();}
-function items(day){return day.vocab.map(v=>({...v,kind:"vocab"})).concat(day.sentences.map(s=>({...s,kind:"sent"})));}
+// Vocab exercises were removed in v2026-11-04g; DAYS[].vocab is kept as data only.
+function items(day){return day.sentences.map(s=>({...s,kind:"sent"}));}
 function key(day,id){return day.id+"/"+id;}
 function uid(dayId,id){return (dayId+"_"+id).replace(/[^\w-]/g,"_");}
 function dayById(id){return DAYS.find(d=>d.id===id);}
 function countDone(day,kind){return items(day).filter(i=>(!kind||i.kind===kind)&&checked[key(day,i.id)]).length;}
-function dayStats(d){const nv=countDone(d,"vocab"),ns=countDone(d,"sent"),total=d.vocab.length+d.sentences.length;return {nv,ns,n:nv+ns,total,all:total>0&&nv+ns===total};}
+function dayStats(d){const ns=countDone(d,"sent"),total=d.sentences.length;return {ns,n:ns,total,all:total>0&&ns===total};}
 
 // ===== Views =====
 function route(){
   stopShadow();
   const h=decodeURIComponent(location.hash.slice(1));
   if(h==="quiz"){if(!quiz)newQuiz();renderQuiz();}
+  else if(h==="words"){wordsMode="list";wordsIdx=0;renderWords();}
   else{const day=dayById(h);day?renderDay(day):renderHome();}
   document.body.dataset.view=view;
   window.scrollTo(0,0);
@@ -330,21 +367,22 @@ function renderHome(){
   view="home";quiz=null;
   const nSent=DAYS.reduce((n,d)=>n+d.sentences.length,0);
   app.innerHTML=`<button class="quizbtn anim" id="quiz-btn" onclick="startQuiz()"><span>🎲 隨機測驗<small>從所有日期隨機抽 ${Math.min(5,nSent)} 個句子來練習</small></span><span class="disc">${ARROW_SVG}</span></button>
+  <a class="quizbtn wordsbtn anim" id="words-btn" href="#words"><span>📒 單字本<small>不熟的單字 <b class="wcount">${activeWords().length}</b> 個 · 點播放聽發音</small></span><span class="disc">${ARROW_SVG}</span></a>
   <div class="sec-head anim"><span class="eyebrow">Practice days</span><h2>練習日期</h2></div>`+DAYS.slice().reverse().map(d=>{
     const st=dayStats(d);
     return `<a class="card day anim ${st.all?'alldone':''}" href="#${d.id}">${st.all?'<span class="party">🎉 完成</span>':''}<h2>📅 ${d.label}</h2>
       <div class="meta">${d.topics}</div>
-      <div class="meta">✅ 單字 ${st.nv}/${d.vocab.length} · 語句 ${st.ns}/${d.sentences.length}</div>
+      <div class="meta">✅ 語句 ${st.ns}/${d.sentences.length}</div>
       <div class="bar"><div style="width:${st.n/st.total*100}%"></div></div></a>`;}).join("");
 }
 function cardHTML(day,it,opt){
   opt=opt||{};
   const u=uid(day.id,it.id),isChk=!opt.quiz&&!!checked[key(day,it.id)];
   let head,q,ph;
-  if(it.kind==="vocab"){head="中文 → English";q=it.zh;ph="Type the English";}
-  else{head=it.t+" · "+(it.type==="fill"?"Fill in the blank":"Fix the sentence");
-    q=it.type==="fill"?it.q.replace(/___/g,'<span class="blank"></span>'):"“"+it.q+"”";
-    ph=it.type==="fill"?"Type the missing words":"Type the corrected sentence";}
+  head=it.t+" · "+(it.type==="fill"?"Fill in the blank":"Fix the sentence");
+  // Fill prompts save the full correct sentence as the example; fix prompts (which contain errors) do too.
+  q=wordsHTML(it.type==="fill"?it.q:"“"+it.q+"”",{dayId:day.id,sent:it.show});
+  ph=it.type==="fill"?"Type the missing words":"Type the corrected sentence";
   return `<div class="card item anim ${isChk?'checked':''}" id="card-${u}">
     ${opt.quiz?`<span class="datetag">📅 ${day.label}</span><span class="qstat hidden" id="qs-${u}"></span>`
       :`<span id="badge-${u}" class="done-badge ${isChk?'':'hidden'}">✓ 已完成</span>`}
@@ -366,13 +404,12 @@ function chkLabel(on){return on?"✓ 已完成（點一下取消）":"✅ 完成
 function renderDay(day){
   view="day";
   stopShadow();
-  const list=tab==="vocab"?day.vocab.map(v=>({...v,kind:"vocab"})):day.sentences.map(s=>({...s,kind:"sent"}));
+  const list=items(day);
   let html=`<div class="row"><button class="back" onclick="location.hash=''"><span class="disc">${BACK_SVG}</span>所有日期</button></div>
   <h2 class="page-title anim">📅 ${day.label}</h2>
-  <nav class="tabs anim"><button id="tab-vocab" class="${tab==='vocab'?'on':''}" onclick="tab='vocab';renderDay(dayById('${day.id}'));Motion.view()"></button>
-  <button id="tab-sent" class="${tab==='sent'?'on':''}" onclick="tab='sent';renderDay(dayById('${day.id}'));Motion.view()"></button></nav>
-  <div class="card task anim"><strong>今日任務：${tab==='vocab'?'單字':'語句練習'}</strong> — <span id="sec-n"></span>
-  <div class="bar"><div id="sec-bar"></div></div><div class="hint" id="sec-msg">覺得這題沒問題了，就按卡片下方的 ✅ 完成 勾起來。</div></div>`;
+  <div class="card task anim"><strong>今日任務：語句練習</strong> — <span id="sec-n"></span>
+  <div class="bar"><div id="sec-bar"></div></div><div class="hint" id="sec-msg">覺得這題沒問題了，就按卡片下方的 ✅ 完成 勾起來。</div>
+  <div class="tiphint">📒 點句子裡不熟的字，就會加入單字本</div></div>`;
   html+=list.map(it=>cardHTML(day,it)).join("");
   html+=`<div class="row"><button class="btn ghost" onclick="resetDay('${day.id}')">重設這一天的勾選</button></div>`;
   app.innerHTML=html;
@@ -380,16 +417,11 @@ function renderDay(day){
   document.body.dataset.view="day";
 }
 function updateDayCounts(day){
-  const st=dayStats(day);
-  const tv=document.getElementById("tab-vocab"),ts=document.getElementById("tab-sent");
-  if(tv)tv.textContent=`單字 ${st.nv}/${day.vocab.length}`;
-  if(ts)ts.textContent=`語句練習 ${st.ns}/${day.sentences.length}`;
-  const tot=tab==="vocab"?day.vocab.length:day.sentences.length,n=tab==="vocab"?st.nv:st.ns;
+  const st=dayStats(day),tot=st.total,n=st.ns;
   const sn=document.getElementById("sec-n"),sb=document.getElementById("sec-bar"),sm=document.getElementById("sec-msg");
   if(sn)sn.textContent=`${n} / ${tot}`;
   if(sb)sb.style.width=(tot?n/tot*100:0)+"%";
-  if(sm&&st.all)sm.textContent="🎉 這一天的單字和語句全部完成了！";
-  else if(sm&&n===tot&&tot)sm.textContent="👍 這一區全部完成！換另一個分頁繼續。";
+  if(sm)sm.textContent=st.all?"🎉 這一天的語句全部完成了！":"覺得這題沒問題了，就按卡片下方的 ✅ 完成 勾起來。";
 }
 function toggleCheck(dayId,id){
   const d=dayById(dayId),k=key(d,id),u=uid(dayId,id);
@@ -402,6 +434,128 @@ function toggleCheck(dayId,id){
   if(btn){btn.classList.toggle("on",on);btn.textContent=chkLabel(on);}
   if(on)Motion.pop(badge);
   updateDayCounts(d);
+}
+
+// ===== 不熟單字 (tap a word) + 📒 單字本 =====
+const WKEY="english-words-v1";
+let words={};try{words=JSON.parse(localStorage.getItem(WKEY)||"{}")||{};}catch(e){}
+function saveWords(){try{localStorage.setItem(WKEY,JSON.stringify(words));}catch(e){}}
+function normWord(w){return String(w).toLowerCase().replace(/[’‘]/g,"'").replace(/[^a-z0-9'\-]/g,"").replace(/^['\-]+|['\-]+$/g,"");}
+// Render text as tappable words. ctx = {dayId, sent} (sent = example sentence to save with the word).
+function wordsHTML(text,ctx){
+  const attrs=`data-day="${esc(ctx.dayId)}" data-sent="${esc(ctx.sent||text)}"`;
+  return `<span class="wds" ${attrs}>`+String(text).split(/(\s+)/).map(tok=>{
+    if(!tok)return "";
+    if(/^\s+$/.test(tok))return tok;
+    if(/^_{2,}$/.test(tok.replace(/[^_]/g,""))&&/_{2,}/.test(tok)){
+      return tok.replace(/_{2,}/,'<span class="blank"></span>');   // keep punctuation around the blank
+    }
+    const m=tok.match(/^([^A-Za-z0-9’']*)(.*?)([^A-Za-z0-9’']*)$/);
+    const pre=m?m[1]:"",core=m?m[2]:tok,post=m?m[3]:"";
+    const w=normWord(core);
+    if(!w||!/[a-z]/.test(w))return esc(tok);
+    return `${esc(pre)}<span class="wd${words[w]?' on':''}" data-w="${esc(w)}" role="button" tabindex="0">${esc(core)}</span>${esc(post)}`;
+  }).join("")+`</span>`;
+}
+function paintWord(w){
+  document.querySelectorAll(`.wd[data-w="${window.CSS&&CSS.escape?CSS.escape(w):w.replace(/["\\]/g,"\\$&")}"]`).forEach(el=>el.classList.toggle("on",!!words[w]));
+}
+function toggleWord(el){
+  const w=el.dataset.w;if(!w)return;
+  const box=el.closest(".wds"),dayId=box?box.dataset.day:"",d=dayById(dayId);
+  if(words[w])delete words[w];
+  else{
+    let sent=box?box.dataset.sent:"";
+    words[w]={w,sent,dayId,label:d?d.label:"",ts:Date.now(),mastered:false};
+  }
+  saveWords();paintWord(w);
+  el.classList.remove("pop");void el.offsetWidth;el.classList.add("pop");
+  updateWordCounts();
+}
+function activeWords(){return Object.values(words).filter(x=>!x.mastered).sort((a,b)=>b.ts-a.ts);}
+function masteredWords(){return Object.values(words).filter(x=>x.mastered).sort((a,b)=>b.ts-a.ts);}
+function updateWordCounts(){
+  const n=activeWords().length;
+  document.querySelectorAll(".wcount").forEach(el=>el.textContent=n);
+}
+document.addEventListener("click",e=>{
+  const el=e.target.closest&&e.target.closest(".wd");
+  if(!el||e.target.closest("button,input,a"))return;
+  if(view==="words"&&el.classList.contains("hl"))return;   // use ✕ 移除 for the card's own word
+  toggleWord(el);
+  if(view==="words")renderWords();
+});
+document.addEventListener("keydown",e=>{
+  const el=e.target.closest&&e.target.closest(".wd");
+  if(el&&(e.key==="Enter"||e.key===" ")){e.preventDefault();toggleWord(el);}
+});
+// Speak a word or sentence synchronously inside the tap.
+function sayText(text,rate){
+  if(cur)stopShadow();
+  stopPlayer();
+  if(!TTS||!window.SpeechSynthesisUtterance)return;
+  speakNow([text],{rate:rate||0.85});
+}
+function sayWord(w,slow){const x=words[w];sayText(x?x.w:w,slow?0.6:0.85);}
+function saySent(w){const x=words[w];if(x&&x.sent)sayText(x.sent,0.9);}
+function highlightIn(sent,w){
+  // Example sentence with every occurrence of the word marked (and still tappable).
+  return wordsHTML(sent,{dayId:(words[w]||{}).dayId||"",sent}).replace(/class="wd( on)?" data-w="([^"]*)"/g,(m,on,dw)=>`class="wd${on||""}${dw===esc(w)?" hl":""}" data-w="${dw}"`);
+}
+let wordsMode="list",wordsIdx=0;
+function wordCardHTML(x,opt){
+  opt=opt||{};
+  const q=JSON.stringify(x.w).replace(/"/g,"&quot;");
+  return `<div class="card wcard anim${opt.big?" big":""}" id="wc-${esc(x.w).replace(/[^\w-]/g,"_")}">
+    ${x.label?`<span class="datetag">📅 ${esc(x.label)}</span>`:""}
+    <div class="wword">${esc(x.w)}</div>
+    <div class="row wplay">
+      <button class="btn mic wbig" onclick="sayWord(${q})" aria-label="播放 ${esc(x.w)}">🔊 聽發音</button>
+      <button class="btn ghost" onclick="sayWord(${q},true)">🐢 慢速</button>
+    </div>
+    ${x.sent?`<div class="wsent"><button class="sentplay" onclick="saySent(${q})" aria-label="播放例句">▶</button><div>${highlightIn(x.sent,x.w)}</div></div>`:""}
+    <div class="row wfoot">
+      ${opt.mastered?`<button class="btn ghost" onclick="setMastered(${q},false)">↩︎ 還原到單字本</button>`
+        :opt.big?`<button class="btn chk" onclick="setMastered(${q},true)">✅ 記住了</button>`:""}
+      <button class="linkbtn wdel" onclick="removeWord(${q})">✕ 移除</button>
+    </div>
+  </div>`;
+}
+function setMastered(w,on){if(!words[w])return;words[w].mastered=on;saveWords();renderWords();}
+function removeWord(w){if(!words[w])return;if(!confirm(`從單字本移除「${w}」？`))return;delete words[w];saveWords();renderWords();}
+function setWordsMode(m){wordsMode=m;wordsIdx=0;renderWords();Motion.view();}
+function stepWord(d){const n=activeWords().length;if(!n)return;wordsIdx=(wordsIdx+d+n)%n;renderWords();Motion.view();}
+function renderWords(){
+  view="words";
+  const act=activeWords(),mas=masteredWords();
+  let html=`<div class="row"><button class="back" onclick="location.hash=''"><span class="disc">${BACK_SVG}</span>回首頁</button></div>
+  <h2 class="page-title anim">📒 單字本</h2>
+  <div class="card task anim"><strong>不熟的單字</strong> — <span id="wtotal">${act.length}</span> 個${mas.length?` · 已記住 ${mas.length} 個`:""}
+    <div class="hint">在語句練習裡點不熟的字，就會出現在這裡。按 🔊 聽發音。</div>
+    ${act.length?`<nav class="tabs" style="margin-top:12px;box-shadow:none;background:var(--ground)">
+      <button id="wm-list" class="${wordsMode==='list'?'on':''}" onclick="setWordsMode('list')">📋 全部列表</button>
+      <button id="wm-practice" class="${wordsMode==='practice'?'on':''}" onclick="setWordsMode('practice')">🃏 練習模式</button></nav>`:""}
+  </div>`;
+  if(!act.length&&!mas.length){
+    html+=`<div class="card empty anim"><div class="wword" style="font-size:40px">📒</div>
+      <p><b>單字本還是空的</b></p>
+      <p class="hint">打開任何一天的語句練習（或隨機測驗），在句子裡<b>點一下不熟的英文字</b>，它會變成橘色標記並加到這裡。再點一次就取消。</p>
+      <div class="row" style="justify-content:center"><button class="btn" onclick="location.hash=''">去練習</button></div></div>`;
+  }else if(!act.length){
+    html+=`<div class="card empty anim"><p><b>🎉 全部都記住了！</b></p><p class="hint">在句子裡點新的不熟單字，或從下面「已記住」還原。</p></div>`;
+  }else if(wordsMode==="practice"){
+    if(wordsIdx>=act.length)wordsIdx=0;
+    html+=`<div class="hint anim" style="margin:10px 6px 0;text-align:center" id="wprog">${wordsIdx+1} / ${act.length}</div>`;
+    html+=wordCardHTML(act[wordsIdx],{big:true});
+    html+=`<div class="row anim" style="justify-content:space-between"><button class="btn ghost" onclick="stepWord(-1)">← 上一個</button><button class="btn" onclick="stepWord(1)">下一個 →</button></div>`;
+  }else{
+    html+=act.map(x=>wordCardHTML(x)).join("");
+  }
+  if(mas.length){
+    html+=`<details class="card mastered anim"><summary>✅ 已記住（${mas.length}）</summary>${mas.map(x=>wordCardHTML(x,{mastered:true})).join("")}</details>`;
+  }
+  app.innerHTML=html;
+  document.body.dataset.view="words";
 }
 
 // ===== Random quiz =====
@@ -454,19 +608,19 @@ function updateQuizProgress(){
 // ===== Actions =====
 function find(dayId,id){const d=dayById(dayId);return [d,items(d).find(i=>i.id===id)];}
 function answerOf(it){return it.kind==="vocab"?it.w:it.a;}
-function shown(it){return it.kind==="vocab"?`<b>${it.show}</b><br><span class="hint">${it.ex}</span>`:`<b>${it.show}</b>`;}
+function shown(it,dayId){return `<b class="ans">${wordsHTML(it.show,{dayId:dayId||"",sent:it.show})}</b>`;}
 // Self-test only: does NOT mark the item as done (use ✅ 完成 for that).
 function check(dayId,id){
   const [d,it]=find(dayId,id),u=uid(dayId,id);
   const v=norm(document.getElementById("in-"+u).value),fb=document.getElementById("fb-"+u);
   if(!v){fb.className="fb no";fb.textContent="Type your answer first 🙂";return false;}
-  const full=it.kind==="vocab"?norm(it.ex):norm(it.show);
+  const full=norm(it.show);
   const ok=answerOf(it).some(a=>norm(a)===v)||full===v;
-  if(ok){fb.className="fb ok";fb.innerHTML="✅ Nice!<br>"+shown(it)+(view==="day"&&!checked[key(d,id)]?'<div class="hint">覺得沒問題就按下方 ✅ 完成 勾起來。</div>':"");quizMark(dayId,id,"ok");}
+  if(ok){fb.className="fb ok";fb.innerHTML="✅ Nice!<br>"+shown(it,dayId)+(view==="day"&&!checked[key(d,id)]?'<div class="hint">覺得沒問題就按下方 ✅ 完成 勾起來。</div>':"");quizMark(dayId,id,"ok");}
   else{fb.className="fb no";fb.innerHTML="Not quite. Try again, or tap “Show answer”.";}
   return ok;
 }
-function reveal(dayId,id){const [d,it]=find(dayId,id);const fb=document.getElementById("fb-"+uid(dayId,id));fb.className="fb ok";fb.innerHTML="💡 Answer:<br>"+shown(it);quizMark(dayId,id,"shown");}
+function reveal(dayId,id){const [d,it]=find(dayId,id);const fb=document.getElementById("fb-"+uid(dayId,id));fb.className="fb ok";fb.innerHTML="💡 Answer:<br>"+shown(it,dayId);quizMark(dayId,id,"shown");}
 function resetDay(dayId){if(!confirm("要清除這一天的 ✅ 完成勾選嗎？"))return;Object.keys(checked).forEach(k=>{if(k.startsWith(dayId+"/"))delete checked[k];});save();route();}
 
 // ===== Shadowing (跟讀) =====
@@ -622,7 +776,7 @@ function modelTexts(it){return it.kind==="vocab"?[it.show].concat(it.ex?[it.ex]:
 function esc(t){return String(t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
 function panel(u){return document.getElementById("sh-"+u);}
 function setPhase(p,ph,html){if(!p)return;p.className="shadow"+(ph?" ph-"+ph:"");p.innerHTML=html;}
-function modelsHTML(it){return modelTexts(it).map(t=>`<div class="model">${esc(t)}</div>`).join("");}
+function modelsHTML(it){const dayId=cur?cur.dayId:"";return modelTexts(it).map(t=>`<div class="model">${wordsHTML(t,{dayId,sent:t})}</div>`).join("");}
 function mimePick(){
   if(!window.MediaRecorder||!MediaRecorder.isTypeSupported)return "";
   for(const t of ["audio/mp4","audio/webm;codecs=opus","audio/webm"])if(MediaRecorder.isTypeSupported(t))return t;
@@ -673,7 +827,7 @@ function speakNow(texts,o){
   const gen=++speakGen;let bId=0,started=false,ended=false;
   const build=()=>{
     const my=++bId;
-    keepUtts=texts.map(t=>{const u=new SpeechSynthesisUtterance(t);u.lang="en-US";if(enVoice)u.voice=enVoice;u.rate=0.9;u.pitch=1;return u;});
+    keepUtts=texts.map(t=>{const u=new SpeechSynthesisUtterance(t);u.lang="en-US";if(enVoice)u.voice=enVoice;u.rate=o.rate||0.9;u.pitch=1;return u;});
     const first=keepUtts[0],last=keepUtts[keepUtts.length-1];
     const live=()=>gen===speakGen&&my===bId;
     first.onstart=()=>{if(!live()||started)return;started=true;o.onStart&&o.onStart();};
