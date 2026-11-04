@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="app-version" content="2026-11-04g">
+<meta name="app-version" content="2026-11-04h">
 <title>My English Practice</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -182,6 +182,12 @@ input[type=text]:focus{outline:none;border-color:var(--ink);background:#fff}
 .wcard.big .wword{font-size:56px;padding:18px 0 6px}
 .wcard.big .row{justify-content:center}
 .btn.wbig{min-height:56px;font-size:18px;padding:12px 26px}
+.wpos{margin-top:4px;font-size:13px;font-weight:600;color:var(--muted);letter-spacing:.04em}
+.wmeanrow{margin-top:10px}
+.wmean{display:inline-block;border:0;background:#fff1e9;color:#7a2d0c;border-radius:14px;padding:8px 14px;font-size:20px;font-weight:600;line-height:1.35;text-align:left;cursor:pointer;font-family:var(--f-body)}
+.wmean.none{background:var(--ground);color:var(--muted);font-size:15px;font-weight:500}
+.wcard.big .wmean{font-size:24px}
+.btn.reveal{min-height:52px;font-size:17px;padding:10px 26px}
 .wsent{display:flex;gap:10px;align-items:flex-start;margin-top:14px;padding:12px 14px;border-radius:16px;background:var(--ground);text-align:left;font-size:16px;line-height:1.55}
 .sentplay{flex:none;width:40px;height:40px;border:0;border-radius:50%;background:var(--ink);color:#fff;font-size:14px;cursor:pointer}
 .wfoot{justify-content:space-between;align-items:center}
@@ -218,7 +224,7 @@ footer .wordmark{font-family:var(--f-display);font-weight:500;font-size:22vw;lin
 <script defer src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
 <script>
 // Bump BOTH this constant and the <meta name="app-version"> tag on every release.
-const APP_VERSION = "2026-11-04g";
+const APP_VERSION = "2026-11-04h";
 (function(){
   var el=document.getElementById('appver'); if(el) el.textContent='v'+APP_VERSION;
   var busy=false;
@@ -367,7 +373,7 @@ function renderHome(){
   view="home";quiz=null;
   const nSent=DAYS.reduce((n,d)=>n+d.sentences.length,0);
   app.innerHTML=`<button class="quizbtn anim" id="quiz-btn" onclick="startQuiz()"><span>🎲 隨機測驗<small>從所有日期隨機抽 ${Math.min(5,nSent)} 個句子來練習</small></span><span class="disc">${ARROW_SVG}</span></button>
-  <a class="quizbtn wordsbtn anim" id="words-btn" href="#words"><span>📒 單字本<small>不熟的單字 <b class="wcount">${activeWords().length}</b> 個 · 點播放聽發音</small></span><span class="disc">${ARROW_SVG}</span></a>
+  <a class="quizbtn wordsbtn anim" id="words-btn" href="#words"><span>📒 單字本<small>不熟的單字 <b class="wcount">${activeWords().length}</b> 個 · 中文解釋＋發音</small></span><span class="disc">${ARROW_SVG}</span></a>
   <div class="sec-head anim"><span class="eyebrow">Practice days</span><h2>練習日期</h2></div>`+DAYS.slice().reverse().map(d=>{
     const st=dayStats(d);
     return `<a class="card day anim ${st.all?'alldone':''}" href="#${d.id}">${st.all?'<span class="party">🎉 完成</span>':''}<h2>📅 ${d.label}</h2>
@@ -436,10 +442,207 @@ function toggleCheck(dayId,id){
   updateDayCounts(d);
 }
 
+// ===== GLOSS: 繁體中文（台灣用法）meanings, context-appropriate for the DAYS sentences =====
+// NOTE: when you add a new day to DAYS, add GLOSS entries for any new words in its sentences
+// (prompts, correct answers and accepted answers). Words missing here fall back to an online lookup.
+const GLOSS={
+"a":{m:"一個（不定冠詞）",p:"art."},
+"about":{m:"關於",p:"prep."},
+"am":{m:"是（I am）",p:"v."},
+"and":{m:"和；而且",p:"conj."},
+"are":{m:"是（複數／you）",p:"v."},
+"around":{m:"四處；在…周圍",p:"adv./prep."},
+"arrive":{m:"抵達（arrive at／in + 地點）",p:"v."},
+"as":{m:"作為；擔任",p:"prep."},
+"at":{m:"在（某地點）",p:"prep."},
+"back":{m:"回來；回去",p:"adv."},
+"beef":{m:"牛肉",p:"n."},
+"been":{m:"（be 的過去分詞）待過；去過",p:"v."},
+"bought":{m:"買了（buy 的過去式）",p:"v."},
+"but":{m:"但是",p:"conj."},
+"buy":{m:"買",p:"v."},
+"by":{m:"由；靠（by myself 自己一個人）",p:"prep."},
+"catch":{m:"聽懂；聽清楚（口語）",p:"v."},
+"center":{m:"中心（city center 市中心）",p:"n."},
+"cheap":{m:"便宜的",p:"adj."},
+"city":{m:"城市",p:"n."},
+"cold":{m:"冷的",p:"adj."},
+"consultant":{m:"顧問",p:"n."},
+"cook":{m:"煮飯；烹飪",p:"v."},
+"could":{m:"可以…嗎（客氣的請求）",p:"aux."},
+"czech":{m:"捷克語；捷克的",p:"n./adj."},
+"day":{m:"一天；日子（soup of the day 今日例湯）",p:"n."},
+"december":{m:"十二月",p:"n."},
+"demonstration":{m:"示威遊行",p:"n."},
+"didn't":{m:"沒有（did not）",p:"aux."},
+"dinner":{m:"晚餐",p:"n."},
+"don't":{m:"不（do not）",p:"aux."},
+"downtown":{m:"市區；市中心",p:"adv./n."},
+"eat":{m:"吃",p:"v."},
+"eating":{m:"吃（eating out 外食）",p:"v."},
+"eggs":{m:"雞蛋（複數）",p:"n."},
+"especially":{m:"尤其；特別是",p:"adv."},
+"europe":{m:"歐洲",p:"n."},
+"everyone":{m:"每個人；大家",p:"pron."},
+"expensive":{m:"昂貴的；很貴",p:"adj."},
+"favorite":{m:"最喜歡的",p:"adj."},
+"food":{m:"食物",p:"n."},
+"for":{m:"為了；支持（protest for 為…抗議）",p:"prep."},
+"freedom":{m:"自由（media freedom 新聞自由）",p:"n."},
+"friend":{m:"朋友",p:"n."},
+"friends":{m:"朋友（複數）",p:"n."},
+"get":{m:"到達（get to 到…）；拿；點（餐）",p:"v."},
+"getting":{m:"變得（It's getting cold 天氣變冷了）",p:"v."},
+"go":{m:"去",p:"v."},
+"had":{m:"必須（had to）；有；吃（have 的過去式）",p:"v."},
+"have":{m:"吃；喝（have hot pot 吃火鍋）；有",p:"v."},
+"here":{m:"這裡",p:"adv."},
+"home":{m:"家（at home 在家）",p:"n."},
+"hot":{m:"熱的（hot pot 火鍋）",p:"adj."},
+"hotel":{m:"飯店；旅館",p:"n."},
+"how":{m:"多麼；如何（how long 多久）",p:"adv."},
+"i":{m:"我",p:"pron."},
+"i'd":{m:"我會（I would）",p:"pron.+aux."},
+"i'm":{m:"我是（I am）",p:"pron.+v."},
+"if":{m:"如果",p:"conj."},
+"in":{m:"在…裡面；用（某種語言）",p:"prep."},
+"into":{m:"進入（went into town 進城）",p:"prep."},
+"is":{m:"是",p:"v."},
+"it":{m:"它；那件事",p:"pron."},
+"it's":{m:"它是；天氣是（it is）",p:"pron.+v."},
+"jacket":{m:"外套；夾克",p:"n."},
+"kitchen":{m:"廚房",p:"n."},
+"like":{m:"喜歡",p:"v."},
+"likes":{m:"喜歡（第三人稱單數）",p:"v."},
+"long":{m:"長的；久的（how long 多久）",p:"adj."},
+"lot":{m:"很多（a lot of 許多）",p:"n."},
+"lots":{m:"很多（lots of 許多）",p:"n."},
+"love":{m:"很喜歡；熱愛",p:"v."},
+"made":{m:"做了；煮了（make 的過去式）",p:"v."},
+"many":{m:"許多的",p:"adj."},
+"markets":{m:"市場（night markets 夜市）",p:"n."},
+"media":{m:"媒體（media freedom 新聞自由）",p:"n."},
+"miss":{m:"想念",p:"v."},
+"most":{m:"最",p:"adv."},
+"must":{m:"必須",p:"aux."},
+"my":{m:"我的",p:"det."},
+"myself":{m:"我自己",p:"pron."},
+"need":{m:"需要",p:"v."},
+"night":{m:"晚上（night market 夜市）",p:"n."},
+"noodle":{m:"麵（beef noodle soup 牛肉麵）",p:"n."},
+"noodles":{m:"麵條（soup noodles 湯麵）",p:"n."},
+"of":{m:"…的",p:"prep."},
+"old":{m:"老的；舊的（old square 老城廣場）",p:"adj."},
+"on":{m:"在…上（on the way 在路上）",p:"prep."},
+"one":{m:"一個",p:"pron."},
+"out":{m:"外面（eating out 外食）",p:"adv."},
+"part-time":{m:"兼職的",p:"adj."},
+"people":{m:"人們",p:"n."},
+"pick":{m:"挑選（pick up 買到、入手）",p:"v."},
+"please":{m:"請（禮貌用語）",p:"adv."},
+"popped":{m:"順道進去一下（pop into 的過去式）",p:"v."},
+"popular":{m:"受歡迎的",p:"adj."},
+"pot":{m:"鍋（hot pot 火鍋）",p:"n."},
+"probably":{m:"大概；可能",p:"adv."},
+"protest":{m:"抗議；示威",p:"n./v."},
+"protesting":{m:"抗議中（protest 的 -ing）",p:"v."},
+"really":{m:"真的；非常",p:"adv."},
+"restaurant":{m:"餐廳",p:"n."},
+"restaurants":{m:"餐廳（複數）",p:"n."},
+"saw":{m:"看到（see 的過去式）",p:"v."},
+"say":{m:"說",p:"v."},
+"shouting":{m:"大喊；呼口號",p:"v."},
+"small":{m:"小的",p:"adj."},
+"so":{m:"所以；那麼地",p:"conj./adv."},
+"some":{m:"一些",p:"det."},
+"sometimes":{m:"有時候",p:"adv."},
+"soup":{m:"湯（soup noodles 湯麵）",p:"n."},
+"square":{m:"廣場",p:"n."},
+"stay":{m:"停留；待",p:"v."},
+"stayed":{m:"待了（stay 的過去式／分詞）",p:"v."},
+"staying":{m:"要待（stay 的 -ing）",p:"v."},
+"street":{m:"街道",p:"n."},
+"supermarket":{m:"超市",p:"n."},
+"taiwan":{m:"台灣",p:"n."},
+"taiwanese":{m:"台灣的",p:"adj."},
+"take":{m:"搭乘（take the tram 搭電車）",p:"v."},
+"that":{m:"那個；以至於（so…that 如此…以至於）",p:"conj./pron."},
+"the":{m:"這個；那個（定冠詞）",p:"art."},
+"there":{m:"那裡（there was 有…）",p:"adv."},
+"there's":{m:"有…（there is）",p:"adv.+v."},
+"time":{m:"時間",p:"n."},
+"to":{m:"去；到；為了（不定詞 to）",p:"prep."},
+"today":{m:"今天",p:"adv."},
+"together":{m:"一起",p:"adv."},
+"too":{m:"太；也",p:"adv."},
+"took":{m:"搭了（take 的過去式）",p:"v."},
+"town":{m:"市區；鎮上（go into town 進城）",p:"n."},
+"tram":{m:"路面電車",p:"n."},
+"understand":{m:"理解；聽懂",p:"v."},
+"until":{m:"直到",p:"prep."},
+"up":{m:"（pick up 買到、入手）",p:"adv."},
+"usually":{m:"通常",p:"adv."},
+"vegetable":{m:"蔬菜",p:"n."},
+"vegetables":{m:"蔬菜（複數）",p:"n."},
+"very":{m:"非常",p:"adv."},
+"walk":{m:"走路；散步（walk around 四處逛逛）",p:"v."},
+"warmer":{m:"比較保暖的（warm 的比較級）",p:"adj."},
+"was":{m:"是；有（is 的過去式）",p:"v."},
+"way":{m:"路（on the way back 回程路上）",p:"n."},
+"weather":{m:"天氣",p:"n."},
+"went":{m:"去了（go 的過去式）",p:"v."},
+"what":{m:"什麼",p:"pron."},
+"when":{m:"當…的時候",p:"conj."},
+"will":{m:"將會",p:"aux."},
+"winter":{m:"冬天",p:"n."},
+"with":{m:"和…一起",p:"prep."},
+"work":{m:"工作",p:"v."},
+"working":{m:"在工作（work 的 -ing）",p:"v."},
+"would":{m:"會；想要（I would）",p:"aux."},
+"you":{m:"你",p:"pron."}
+};
+
 // ===== 不熟單字 (tap a word) + 📒 單字本 =====
 const WKEY="english-words-v1";
 let words={};try{words=JSON.parse(localStorage.getItem(WKEY)||"{}")||{};}catch(e){}
 function saveWords(){try{localStorage.setItem(WKEY,JSON.stringify(words));}catch(e){}}
+// Saved words from before v2026-11-04h get their meaning from GLOSS.
+(function(){let ch=false;Object.values(words).forEach(x=>{if(x&&!x.m&&GLOSS[x.w]){x.m=GLOSS[x.w].m;x.p=GLOSS[x.w].p;ch=true;}});if(ch)saveWords();})();
+// Fallback meanings (words not in GLOSS) from the free MyMemory API, cached locally.
+const LKEY="english-lookup-v1";
+let lookup={};try{lookup=JSON.parse(localStorage.getItem(LKEY)||"{}")||{};}catch(e){}
+const lookupPending={};
+function meaningOf(x){if(!x)return null;if(x.m)return x.m;if(GLOSS[x.w])return GLOSS[x.w].m;if(typeof lookup[x.w]==="string")return lookup[x.w]||"";return null;}
+function fetchMeaning(w){
+  if(lookupPending[w]||typeof lookup[w]==="string"||!window.fetch)return;
+  lookupPending[w]=true;
+  fetch("https://api.mymemory.translated.net/get?q="+encodeURIComponent(w)+"&langpair="+encodeURIComponent("en|zh-TW"))
+    .then(r=>r.ok?r.json():null)
+    .then(j=>{
+      let t=j&&j.responseData&&j.responseData.translatedText||"";
+      t=String(t).trim();
+      if(!t||/MYMEMORY|INVALID|QUERY LENGTH/i.test(t)||t.toLowerCase()===w)t="";
+      return t;
+    },()=>null)
+    .then(t=>{
+      delete lookupPending[w];
+      if(t===null)return paintMeaning(w,true);          // network error: don't cache, show 暫無解釋
+      lookup[w]=t;try{localStorage.setItem(LKEY,JSON.stringify(lookup));}catch(e){}
+      if(words[w]&&!words[w].mEdited&&t){words[w].m=t;saveWords();}
+      paintMeaning(w);
+    });
+}
+function meaningText(x,failed){const m=meaningOf(x);return m?m:(m===null&&!failed?"查詢中…":"暫無解釋（點這裡自己加）");}
+function paintMeaning(w,failed){
+  const x=words[w]||{w};
+  document.querySelectorAll(".wmean").forEach(el=>{if(el.dataset.w===w){el.textContent=meaningText(x,failed);el.classList.toggle("none",!meaningOf(x));}});
+}
+function editMeaning(w){
+  const x=words[w];if(!x)return;
+  const v=prompt(`「${w}」的中文解釋：`,meaningOf(x)||"");
+  if(v===null)return;
+  x.m=v.trim();x.mEdited=true;saveWords();paintMeaning(w);
+}
 function normWord(w){return String(w).toLowerCase().replace(/[’‘]/g,"'").replace(/[^a-z0-9'\-]/g,"").replace(/^['\-]+|['\-]+$/g,"");}
 // Render text as tappable words. ctx = {dayId, sent} (sent = example sentence to save with the word).
 function wordsHTML(text,ctx){
@@ -466,7 +669,9 @@ function toggleWord(el){
   if(words[w])delete words[w];
   else{
     let sent=box?box.dataset.sent:"";
-    words[w]={w,sent,dayId,label:d?d.label:"",ts:Date.now(),mastered:false};
+    const g=GLOSS[w];
+    words[w]={w,sent,dayId,label:d?d.label:"",ts:Date.now(),mastered:false,m:g?g.m:"",p:g?g.p:""};
+    if(!g)fetchMeaning(w);
   }
   saveWords();paintWord(w);
   el.classList.remove("pop");void el.offsetWidth;el.classList.add("pop");
@@ -497,23 +702,24 @@ function sayText(text,rate){
   speakNow([text],{rate:rate||0.85});
 }
 function sayWord(w,slow){const x=words[w];sayText(x?x.w:w,slow?0.6:0.85);}
-function saySent(w){const x=words[w];if(x&&x.sent)sayText(x.sent,0.9);}
-function highlightIn(sent,w){
-  // Example sentence with every occurrence of the word marked (and still tappable).
-  return wordsHTML(sent,{dayId:(words[w]||{}).dayId||"",sent}).replace(/class="wd( on)?" data-w="([^"]*)"/g,(m,on,dw)=>`class="wd${on||""}${dw===esc(w)?" hl":""}" data-w="${dw}"`);
-}
-let wordsMode="list",wordsIdx=0;
+let wordsMode="list",wordsIdx=0,wordsReveal=false;
 function wordCardHTML(x,opt){
   opt=opt||{};
   const q=JSON.stringify(x.w).replace(/"/g,"&quot;");
+  const m=meaningOf(x);
+  if(m===null)fetchMeaning(x.w);
+  const pos=x.p||(GLOSS[x.w]&&GLOSS[x.w].p)||"";
+  const meanBtn=`<button class="wmean${m?"":" none"}" data-w="${esc(x.w)}" onclick="editMeaning(${q})" title="點一下可以修改">${esc(meaningText(x))}</button>`;
+  const hidden=opt.big&&!wordsReveal;
   return `<div class="card wcard anim${opt.big?" big":""}" id="wc-${esc(x.w).replace(/[^\w-]/g,"_")}">
     ${x.label?`<span class="datetag">📅 ${esc(x.label)}</span>`:""}
     <div class="wword">${esc(x.w)}</div>
+    ${pos?`<div class="wpos">${esc(pos)}</div>`:""}
+    <div class="wmeanrow">${hidden?`<button class="btn ghost reveal" id="wreveal" onclick="wordsReveal=true;renderWords()">👀 看中文</button>`:meanBtn}</div>
     <div class="row wplay">
       <button class="btn mic wbig" onclick="sayWord(${q})" aria-label="播放 ${esc(x.w)}">🔊 聽發音</button>
       <button class="btn ghost" onclick="sayWord(${q},true)">🐢 慢速</button>
     </div>
-    ${x.sent?`<div class="wsent"><button class="sentplay" onclick="saySent(${q})" aria-label="播放例句">▶</button><div>${highlightIn(x.sent,x.w)}</div></div>`:""}
     <div class="row wfoot">
       ${opt.mastered?`<button class="btn ghost" onclick="setMastered(${q},false)">↩︎ 還原到單字本</button>`
         :opt.big?`<button class="btn chk" onclick="setMastered(${q},true)">✅ 記住了</button>`:""}
@@ -521,17 +727,17 @@ function wordCardHTML(x,opt){
     </div>
   </div>`;
 }
-function setMastered(w,on){if(!words[w])return;words[w].mastered=on;saveWords();renderWords();}
+function setMastered(w,on){if(!words[w])return;words[w].mastered=on;wordsReveal=false;saveWords();renderWords();}
 function removeWord(w){if(!words[w])return;if(!confirm(`從單字本移除「${w}」？`))return;delete words[w];saveWords();renderWords();}
-function setWordsMode(m){wordsMode=m;wordsIdx=0;renderWords();Motion.view();}
-function stepWord(d){const n=activeWords().length;if(!n)return;wordsIdx=(wordsIdx+d+n)%n;renderWords();Motion.view();}
+function setWordsMode(m){wordsMode=m;wordsIdx=0;wordsReveal=false;renderWords();Motion.view();}
+function stepWord(d){const n=activeWords().length;if(!n)return;wordsIdx=(wordsIdx+d+n)%n;wordsReveal=false;renderWords();Motion.view();}
 function renderWords(){
   view="words";
   const act=activeWords(),mas=masteredWords();
   let html=`<div class="row"><button class="back" onclick="location.hash=''"><span class="disc">${BACK_SVG}</span>回首頁</button></div>
   <h2 class="page-title anim">📒 單字本</h2>
   <div class="card task anim"><strong>不熟的單字</strong> — <span id="wtotal">${act.length}</span> 個${mas.length?` · 已記住 ${mas.length} 個`:""}
-    <div class="hint">在語句練習裡點不熟的字，就會出現在這裡。按 🔊 聽發音。</div>
+    <div class="hint">在語句練習裡點不熟的字，就會出現在這裡。按 🔊 聽發音，點中文解釋可以自己修改。</div>
     ${act.length?`<nav class="tabs" style="margin-top:12px;box-shadow:none;background:var(--ground)">
       <button id="wm-list" class="${wordsMode==='list'?'on':''}" onclick="setWordsMode('list')">📋 全部列表</button>
       <button id="wm-practice" class="${wordsMode==='practice'?'on':''}" onclick="setWordsMode('practice')">🃏 練習模式</button></nav>`:""}
