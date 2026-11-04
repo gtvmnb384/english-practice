@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="app-version" content="2026-11-04i">
+<meta name="app-version" content="2026-11-04j">
 <title>My English Practice</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -66,11 +66,11 @@ button,input{font:inherit;color:inherit}
 .hero .sub{position:relative;z-index:1;margin:0;max-width:30ch;color:#e9ebfa;font-size:16px}
 .chips{position:relative;z-index:1;display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
 .chip{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:var(--pill);background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);font-size:13px;font-weight:500}
-body[data-view="day"] .hero-window,body[data-view="quiz"] .hero-window,body[data-view="words"] .hero-window{min-height:0;padding:72px 20px 16px}
-body[data-view="day"] .hero h1,body[data-view="quiz"] .hero h1,body[data-view="words"] .hero h1{font-size:28px;margin:0}
-body[data-view="day"] .hero .ln,body[data-view="quiz"] .hero .ln,body[data-view="words"] .hero .ln{display:inline}
-body[data-view="day"] .hero .eyebrow,body[data-view="quiz"] .hero .eyebrow,body[data-view="words"] .hero .eyebrow{display:none}
-body[data-view="day"] .hero .sub,body[data-view="day"] .chips,body[data-view="words"] .hero .sub,body[data-view="words"] .chips,body[data-view="quiz"] .hero .sub,body[data-view="quiz"] .chips{display:none}
+body[data-view="day"] .hero-window,body[data-view="quiz"] .hero-window,body[data-view="words"] .hero-window,body[data-view="notes"] .hero-window{min-height:0;padding:72px 20px 16px}
+body[data-view="day"] .hero h1,body[data-view="quiz"] .hero h1,body[data-view="words"] .hero h1,body[data-view="notes"] .hero h1{font-size:28px;margin:0}
+body[data-view="day"] .hero .ln,body[data-view="quiz"] .hero .ln,body[data-view="words"] .hero .ln,body[data-view="notes"] .hero .ln{display:inline}
+body[data-view="day"] .hero .eyebrow,body[data-view="quiz"] .hero .eyebrow,body[data-view="words"] .hero .eyebrow,body[data-view="notes"] .hero .eyebrow{display:none}
+body[data-view="day"] .hero .sub,body[data-view="day"] .chips,body[data-view="words"] .hero .sub,body[data-view="notes"] .hero .sub,body[data-view="words"] .chips,body[data-view="quiz"] .hero .sub,body[data-view="quiz"] .chips,body[data-view="notes"] .chips{display:none}
 .hero{margin-top:-56px}
 
 .wrap{max-width:760px;margin:0 auto;padding:6px 14px 20px}
@@ -204,19 +204,14 @@ footer .fl{max-width:760px;margin:0 auto;line-height:1.7}
 footer .wordmark{font-family:var(--f-display);font-weight:500;font-size:22vw;line-height:.8;letter-spacing:-.05em;color:var(--ink);margin:22px -4px -2vw;white-space:nowrap}
 @media (min-width:760px){footer .wordmark{font-size:170px}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}.rv{opacity:1;transform:none}}
-.notesbtn{text-decoration:none;color:#fff;background:radial-gradient(90% 100% at 0% 0%,rgba(242,120,63,.75),transparent 60%),linear-gradient(135deg,var(--ink),var(--night));font-size:24px}
-.notes-hero{background:radial-gradient(70% 80% at 100% 0%,rgba(242,120,63,.4),transparent 60%),linear-gradient(160deg,var(--night),var(--ink));color:#fff;border-radius:var(--r1);padding:26px 22px;margin:14px 0}
-.notes-hero h1{margin:6px 0 0;font-family:var(--f-display);font-size:30px;letter-spacing:-.02em}
-.notes-hero .eyebrow{color:var(--ember)}
-.ncard{background:linear-gradient(180deg,var(--night),#16123d);color:#fff;border-radius:var(--r2);padding:18px;margin:14px 0;border:1px solid rgba(242,120,63,.25);box-shadow:0 18px 40px -24px rgba(13,11,39,.6)}
-.nhead{display:flex;align-items:center;gap:10px;font-family:var(--f-display);font-size:19px;font-weight:600;color:var(--ember);margin-bottom:6px}
-.nnum{font-size:12px;color:var(--night);background:var(--ember);border-radius:999px;padding:3px 8px}
-.nrow{padding:12px 0;border-top:1px solid rgba(255,255,255,.08)}
+.ncard .nnum{display:inline-block;font-size:12px;font-weight:600;color:var(--night);background:var(--ember);border-radius:var(--pill);padding:2px 9px;margin-right:6px;letter-spacing:0}
+.nrow{padding:12px 0;border-top:1px solid rgba(33,28,85,.08)}
 .nrow:first-of-type{border-top:0}
-.nen{display:flex;align-items:center;justify-content:space-between;gap:10px;font-family:var(--f-display);font-size:21px;line-height:1.3;margin:4px 0}
-.nsay{flex:none;width:40px;height:40px;border-radius:50%;border:0;background:rgba(242,120,63,.18);font-size:18px;cursor:pointer}
-.nsay.on{background:var(--ember)}
-.nnote{margin-top:6px;font-size:14px;color:#c9c6ee;background:rgba(255,255,255,.06);border-left:3px solid var(--ember);border-radius:10px;padding:8px 10px}
+.nen{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.nen .q{margin:4px 0}
+.nsay{flex:none;min-height:40px;padding:8px 14px}
+.nsay.on{background:var(--night);color:var(--ember)}
+.nnote{margin-top:4px;border-left:3px solid var(--ember);padding-left:10px}
 </style>
 </head>
 <body>
@@ -237,7 +232,7 @@ footer .wordmark{font-family:var(--f-display);font-weight:500;font-size:22vw;lin
 <script defer src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
 <script>
 // Bump BOTH this constant and the <meta name="app-version"> tag on every release.
-const APP_VERSION = "2026-11-04i";
+const APP_VERSION = "2026-11-04j";
 (function(){
   var el=document.getElementById('appver'); if(el) el.textContent='v'+APP_VERSION;
   var busy=false;
@@ -419,9 +414,9 @@ function sayNote(btn){const t=btn.getAttribute("data-say");if(!TTS||!window.Spee
 function renderNotes(n){
   view="notes";
   app.innerHTML=`<div class="row"><button class="back" onclick="location.hash=''"><span class="disc">${BACK_SVG}</span>回首頁</button></div>
-  <div class="notes-hero anim"><span class="eyebrow">Today's key points</span><h1>${esc(n.title)}</h1></div>`+
-  n.cards.map((c,ci)=>`<div class="ncard anim"><div class="nhead"><span class="nnum">0${ci+1}</span>${c.icon} ${esc(c.name)}</div>`+
-    c.rows.map(r=>`<div class="nrow">${r.en.map(e=>`<div class="nen"><span>${esc(e)}</span><button class="nsay" data-say="${esc(e)}" onclick="sayNote(this)" aria-label="播放">🔊</button></div>`).join("")}<div class="nnote">💡 ${esc(r.note)}</div></div>`).join("")+`</div>`).join("");
+  <h2 class="page-title anim">📝 ${esc(n.title)}</h2>`+
+  n.cards.map((c,ci)=>`<div class="card item ncard anim"><div class="topic"><span class="nnum">0${ci+1}</span>${c.icon} ${esc(c.name)}</div>`+
+    c.rows.map(r=>`<div class="nrow">${r.en.map(e=>`<div class="nen"><div class="q">${esc(e)}</div><button class="btn mic nsay" data-say="${esc(e)}" onclick="sayNote(this)" aria-label="播放">🔊</button></div>`).join("")}<div class="hint nnote">💡 ${esc(r.note)}</div></div>`).join("")+`</div>`).join("");
 }
 
 // ===== Views =====
@@ -441,7 +436,7 @@ function renderHome(){
   const nSent=DAYS.reduce((n,d)=>n+d.sentences.length,0);
   app.innerHTML=`<button class="quizbtn anim" id="quiz-btn" onclick="startQuiz()"><span>🎲 隨機測驗<small>從所有日期隨機抽 ${Math.min(5,nSent)} 個句子來練習</small></span><span class="disc">${ARROW_SVG}</span></button>
   <a class="quizbtn wordsbtn anim" id="words-btn" href="#words"><span>📒 單字本<small>不熟的單字 <b class="wcount">${activeWords().length}</b> 個 · 中文解釋＋發音</small></span><span class="disc">${ARROW_SVG}</span></a>
-  `+NOTES.slice().reverse().map(n=>`<a class="quizbtn notesbtn anim" id="notes-btn-${n.id}" href="#notes-${n.id}"><span>📝 ${esc(n.title)}<small>${n.cards.map(c=>c.name.split("：")[1]||c.name).join(" · ")}</small></span><span class="disc">${ARROW_SVG}</span></a>`).join("")+`
+  <div class="sec-head anim"><span class="eyebrow">Key points</span><h2>練習重點</h2></div>`+NOTES.slice().reverse().map(n=>`<a class="card day anim" id="notes-btn-${n.id}" href="#notes-${n.id}"><h2>📝 ${esc(n.title)}</h2><div class="meta">${n.cards.map(c=>c.name.split("：")[1]||c.name).join(" · ")}</div><div class="meta">💡 ${n.cards.reduce((k,c)=>k+c.rows.length,0)} 個重點</div></a>`).join("")+`
   <div class="sec-head anim"><span class="eyebrow">Practice days</span><h2>練習日期</h2></div>`+DAYS.slice().reverse().map(d=>{
     const st=dayStats(d);
     return `<a class="card day anim ${st.all?'alldone':''}" href="#${d.id}">${st.all?'<span class="party">🎉 完成</span>':''}<h2>📅 ${d.label}</h2>
@@ -706,7 +701,7 @@ const GLOSS={
 const WKEY="english-words-v1";
 let words={};try{words=JSON.parse(localStorage.getItem(WKEY)||"{}")||{};}catch(e){}
 function saveWords(){try{localStorage.setItem(WKEY,JSON.stringify(words));}catch(e){}}
-// Saved words from before v2026-11-04i get their meaning from GLOSS.
+// Saved words from before v2026-11-04j get their meaning from GLOSS.
 (function(){let ch=false;Object.values(words).forEach(x=>{if(x&&!x.m&&GLOSS[x.w]){x.m=GLOSS[x.w].m;x.p=GLOSS[x.w].p;ch=true;}});if(ch)saveWords();})();
 // Fallback meanings (words not in GLOSS) from the free MyMemory API, cached locally.
 const LKEY="english-lookup-v1";
