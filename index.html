@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="app-version" content="2026-11-04d">
+<meta name="app-version" content="2026-11-04e">
 <title>My English Practice</title>
 <style>
 :root{--bg:#fdf6ec;--card:#fff;--ink:#3b2f2a;--accent:#e07a5f;--accent2:#81b29a;--muted:#8a7b72;--line:#f0e2d0}
@@ -69,6 +69,8 @@ input[type=text]{width:100%;padding:10px 12px;border:1px solid #e3d3bf;border-ra
 .shadow.ph-rec{background:#fdecea;border:2px solid #c0392b}
 .shadow.ph-done{background:#e9f6ee;border:2px solid #4caf7d}
 .shadow.ph-done .ph{background:#4caf7d}
+.recinfo{margin-top:6px;font-size:.8rem;color:var(--muted)}
+.linkbtn{border:none;background:none;color:#b0543a;font-size:.8rem;padding:2px 4px;cursor:pointer;text-decoration:underline}
 .shadow.ph-warn{background:#fff4ec;border:2px solid #e07a5f}
 .blank{display:inline-block;min-width:60px;border-bottom:2px dashed var(--accent);margin:0 3px}
 .hidden{display:none}
@@ -81,10 +83,10 @@ footer{text-align:center;color:var(--muted);font-size:.85rem;padding:24px}
   <p>A little practice every day goes a long way. 加油！</p>
 </header>
 <div class="wrap" id="app"></div>
-<footer>Progress is saved in this browser only · 🔊 跟讀：先聽標準發音，再錄自己的聲音 · <span id="appver" style="opacity:.6"></span></footer>
+<footer>Progress is saved in this browser only · 🎙️ 錄音只存在這支手機上 · 🔊 跟讀：先聽標準發音，再錄自己的聲音 · <span id="appver" style="opacity:.6"></span></footer>
 <script>
 // Bump BOTH this constant and the <meta name="app-version"> tag on every release.
-const APP_VERSION = "2026-11-04d";
+const APP_VERSION = "2026-11-04e";
 (function(){
   var el=document.getElementById('appver'); if(el) el.textContent='v'+APP_VERSION;
   var busy=false;
@@ -216,7 +218,7 @@ function cardHTML(day,it,opt){
       <button class="btn ghost" onclick="reveal('${day.id}','${it.id}')">Show answer</button>
     </div>
     <div class="fb" id="fb-${u}"></div>
-    <div class="shadow${recordings[u]?' ph-done':''}" id="sh-${u}">${shadowDoneHTML(day.id,it.id)}</div>
+    <div class="shadow${recordings[u]?' ph-done':''}" id="sh-${u}" data-day="${day.id}" data-id="${it.id}">${shadowDoneHTML(day.id,it.id)}</div>
     ${opt.quiz?"":`<div class="row chkrow"><button class="btn chk ${isChk?'on':''}" id="chk-${u}" onclick="toggleCheck('${day.id}','${it.id}')">${chkLabel(isChk)}</button></div>`}
   </div>`;
 }
@@ -336,7 +338,77 @@ function pickVoice(){
     ||vs.find(v=>v.lang==="en-US"||v.lang==="en_US")||vs.find(v=>/^en/i.test(v.lang))||null;
 }
 if(TTS){pickVoice();if("onvoiceschanged" in TTS)TTS.onvoiceschanged=pickVoice;}
-const recordings={};   // id -> blob URL of the user's last recording
+const recordings={};   // uid -> blob URL of the user's latest recording
+const recMeta={};      // uid -> timestamp (ms) of that recording
+
+// ---- Saved recordings (IndexedDB, key "dayId/itemId"; quiz + day cards share it) ----
+const RecDB=(function(){
+  let dbp=null;
+  function open(){
+    if(dbp)return dbp;
+    dbp=new Promise((res,rej)=>{
+      try{
+        if(!window.indexedDB)return rej(new Error("no indexedDB"));
+        const r=indexedDB.open("english-practice",1);
+        r.onupgradeneeded=()=>{if(!r.result.objectStoreNames.contains("recordings"))r.result.createObjectStore("recordings");};
+        r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);r.onblocked=()=>rej(new Error("blocked"));
+      }catch(e){rej(e);}
+    });
+    dbp.catch(()=>{dbp=null;});
+    return dbp;
+  }
+  function run(mode,fn){return open().then(db=>new Promise((res,rej)=>{
+    const t=db.transaction("recordings",mode),out=fn(t.objectStore("recordings"));
+    t.oncomplete=()=>res(out&&out.result);t.onerror=()=>rej(t.error);t.onabort=()=>rej(t.error);}));}
+  return {
+    put:(k,v)=>run("readwrite",st=>st.put(v,k)),
+    del:k=>run("readwrite",st=>st.delete(k)),
+    all:()=>open().then(db=>new Promise((res,rej)=>{
+      const rows=[],t=db.transaction("recordings","readonly"),c=t.objectStore("recordings").openCursor();
+      c.onsuccess=()=>{const cc=c.result;if(cc){rows.push([cc.key,cc.value]);cc.continue();}};
+      t.oncomplete=()=>res(rows);t.onerror=()=>rej(t.error);}))
+  };
+})();
+function recKey(dayId,id){return dayId+"/"+id;}
+function saveRec(dayId,id,blob,type,ts){
+  const k=recKey(dayId,id),base={type,ts,dayId,id};
+  return RecDB.put(k,Object.assign({blob},base)).catch(()=>   // some Safari versions can't store Blobs → store bytes
+    blob.arrayBuffer?blob.arrayBuffer().then(buf=>RecDB.put(k,Object.assign({buf},base))):Promise.reject()
+  ).catch(()=>{});   // IndexedDB unavailable: recording still works for this session
+}
+function loadRecs(){
+  return RecDB.all().then(rows=>{
+    rows.forEach(([k,v])=>{
+      if(!v)return;
+      const dayId=v.dayId||String(k).split("/")[0],id=v.id||String(k).split("/").slice(1).join("/");
+      const u=uid(dayId,id);
+      if(recordings[u])return;   // a newer one was recorded meanwhile
+      const blob=v.blob||(v.buf?new Blob([v.buf],{type:v.type||"audio/mp4"}):null);
+      if(!blob)return;
+      recordings[u]=URL.createObjectURL(blob);recMeta[u]=v.ts||0;
+    });
+    refreshPanels();
+  }).catch(()=>{});
+}
+function refreshPanels(){
+  document.querySelectorAll(".shadow[data-day]").forEach(p=>{
+    if(cur&&p.id==="sh-"+cur.u)return;
+    if(p.innerHTML.trim()&&!p.querySelector(".recinfo"))return;   // keep notes from a just-finished round
+    const u=uid(p.dataset.day,p.dataset.id);
+    setPhase(p,recordings[u]?"done":"",shadowDoneHTML(p.dataset.day,p.dataset.id));
+  });
+}
+function recLabel(ts){if(!ts)return "";const d=new Date(ts),z=n=>String(n).padStart(2,"0");return `${d.getMonth()+1}/${d.getDate()} ${z(d.getHours())}:${z(d.getMinutes())}`;}
+function deleteRec(dayId,id){
+  if(!confirm("刪除這題的錄音？"))return;
+  const u=uid(dayId,id);
+  if(cur&&cur.u===u)stopShadow();
+  stopPlayer();
+  if(recordings[u])URL.revokeObjectURL(recordings[u]);
+  delete recordings[u];delete recMeta[u];
+  RecDB.del(recKey(dayId,id)).catch(()=>{});
+  setPhase(panel(u),"",shadowDoneHTML(dayId,id));
+}
 let cur=null;          // the one active session
 let keepUtts=[];       // keep utterances referenced (Safari GC bug)
 let player=null;       // shared <audio> for playback
@@ -431,9 +503,10 @@ function shadowDoneHTML(dayId,id,note){
       ${has?`<button class="btn mic" onclick="playMine('${dayId}','${id}')">▶️ 聽我的錄音</button>`:""}
       <button class="btn ghost" onclick="replayModel('${dayId}','${id}')">🔊 再聽一次標準</button>
       <button class="btn" onclick="shadow('${dayId}','${id}')">🔁 再練一次</button>
-    </div>`;
+    </div>
+    ${has?`<div class="recinfo">🕒 我的錄音 ${recLabel(recMeta[u])} · <button class="linkbtn" onclick="deleteRec('${dayId}','${id}')">🗑 刪除錄音</button></div>`:""}`;
 }
-function stopPlayer(){if(player){try{player.pause();}catch(e){}}}
+function stopPlayer(){if(player&&!player.paused){try{player.pause();player.currentTime=0;}catch(e){}}}
 function clearTimers(s){s.timers.forEach(t=>{clearTimeout(t);clearInterval(t);});s.timers=[];}
 function stopShadow(){
   stopPlayer();
@@ -441,48 +514,72 @@ function stopShadow(){
   const s=cur;cur=null;
   s.cancelled=true;
   clearTimers(s);
-  if(TTS){try{TTS.cancel();}catch(e){}}
+  ttsStop();
   if(s.rec&&s.rec.state!=="inactive"){s.discard=true;try{s.rec.stop();}catch(e){}}
   if(s.meter){try{s.meter.stop();}catch(e){}s.meter=null;}
   const b=document.getElementById("sh-btn-"+s.u);if(b){b.classList.remove("rec");b.textContent="🔊 跟讀";b.onclick=()=>shadow(s.dayId,s.id);}
   setPhase(panel(s.u),recordings[s.u]?"done":"",shadowDoneHTML(s.dayId,s.id));
 }
+// ---- Speech (model voice) ----
+function ttsBusy(){return !!TTS&&(TTS.speaking||TTS.pending);}
+function ttsStop(){if(ttsBusy()){try{TTS.cancel();}catch(e){}}}   // iOS: cancel() on an idle engine delays the next speak()
+let speakGen=0;
+// Speak right now, in the same tick as the tap. Watchdog: iOS sometimes swallows a speak() that
+// follows cancel(); if nothing started after 300ms, re-issue once.
+function speakNow(texts,o){
+  o=o||{};
+  const gen=++speakGen;let bId=0,started=false,ended=false;
+  const build=()=>{
+    const my=++bId;
+    keepUtts=texts.map(t=>{const u=new SpeechSynthesisUtterance(t);u.lang="en-US";if(enVoice)u.voice=enVoice;u.rate=0.9;u.pitch=1;return u;});
+    const first=keepUtts[0],last=keepUtts[keepUtts.length-1];
+    const live=()=>gen===speakGen&&my===bId;
+    first.onstart=()=>{if(!live()||started)return;started=true;o.onStart&&o.onStart();};
+    last.onend=()=>{if(!live()||ended)return;ended=true;o.onEnd&&o.onEnd(true);};
+    last.onerror=()=>{if(!live()||ended)return;ended=true;o.onEnd&&o.onEnd(false);};
+    keepUtts.forEach(u=>TTS.speak(u));
+  };
+  ttsStop();
+  if(TTS.paused){try{TTS.resume();}catch(e){}}
+  build();
+  const wd=setTimeout(()=>{
+    if(gen!==speakGen||started||ended||TTS.speaking)return;
+    bId++;try{TTS.cancel();}catch(e){}
+    build();
+  },300);
+  if(o.timers)o.timers.push(wd);
+}
 // Speak the model; onDone(measuredSeconds|null, spoke) is called once.
-function speakModel(s,it,onDone){
-  const texts=modelTexts(it);
+function speakModel(s,texts,onDone){
   const est=wordCount(texts)/2.5/0.9+0.6;
-  if(!TTS||!window.SpeechSynthesisUtterance){onDone(null,false);return;}
-  try{TTS.cancel();}catch(e){}
+  if(!TTS||!window.SpeechSynthesisUtterance){s.timers.push(setTimeout(()=>onDone(null,false),0));return;}
   let started=0,finished=false;
   const finish=real=>{if(finished||s.cancelled)return;finished=true;
     const d=started?(Date.now()-started)/1000:0;
     onDone(real&&d>0.4&&d<est*3?d:null,true);};
-  keepUtts=texts.map((t,i)=>{
-    const u=new SpeechSynthesisUtterance(t);
-    u.lang="en-US";if(enVoice)u.voice=enVoice;u.rate=0.9;u.pitch=1;
-    if(i===0)u.onstart=()=>{started=Date.now();};
-    if(i===texts.length-1){u.onend=()=>finish(true);u.onerror=()=>finish(false);}
-    return u;
-  });
-  keepUtts.forEach(u=>TTS.speak(u));      // inside the tap handler (iOS needs this)
+  speakNow(texts,{timers:s.timers,onStart(){started=Date.now();},onEnd:finish});
   s.timers.push(setTimeout(()=>finish(false),(est*2.2+4)*1000));   // some iOS versions skip onend
 }
 function shadow(dayId,id){
-  const [d,it]=find(dayId,id);
-  stopShadow();
-  const u=uid(dayId,id);
-  const s={dayId,id,u,timers:[],cancelled:false,rec:null,stream:null,chunks:[]};
+  const [d,it]=find(dayId,id),texts=modelTexts(it),u=uid(dayId,id);
+  stopShadow();   // synchronous: pause <audio>, stop recorder; no awaits
+  const s={dayId,id,u,timers:[],cancelled:false,rec:null,stream:null,chunks:[],micP:null};
   cur=s;
-  ensureAudioCtx();   // create/resume inside the tap (iOS)
-  const b=document.getElementById("sh-btn-"+u);
-  if(b){b.classList.add("rec");b.textContent="⏹ 停止";b.onclick=()=>{if(cur===s)stopShadow();else shadow(dayId,id);};}
-  setPhase(panel(u),"listen",`<div class="st"><span class="ph">🔊 聽</span><b>先聽標準發音，先不要唸</b></div>${modelsHTML(it)}`);
-  speakModel(s,it,(measured,spoke)=>{
+  // 1) Model voice FIRST, same tick as the tap (nothing awaited before it).
+  speakModel(s,texts,(measured,spoke)=>{
     if(s.cancelled)return;
     const note=spoke?"":"（這個瀏覽器不能播放語音，請看上面的句子唸）";
     if(!CAN_REC){finishSession(s,"🙏 這個瀏覽器不支援錄音，可以先跟著唸幾次。建議用 iPhone 的 Safari 打開。"+note);return;}
-    startRecording(s,it,recWindow(modelTexts(it),measured));
+    startRecording(s,it,recWindow(texts,measured));
   });
+  // 2) Then the rest, without blocking speech.
+  ensureAudioCtx();   // create/resume inside the tap (iOS); no-op when already running
+  // Mic in parallel while the model plays — only when a stream is already held (no prompt, no
+  // audio-session switch mid-speech). The very first round asks after the model finishes.
+  if(CAN_REC&&micLive(micStream)){s.micP=freshMic();s.micP.catch(()=>{});}
+  const b=document.getElementById("sh-btn-"+u);
+  if(b){b.classList.add("rec");b.textContent="⏹ 停止";b.onclick=()=>{if(cur===s)stopShadow();else shadow(dayId,id);};}
+  setPhase(panel(u),"listen",`<div class="st"><span class="ph">🔊 聽</span><b>先聽標準發音，先不要唸</b></div>${modelsHTML(it)}`);
 }
 function finishSession(s,note,ok){
   clearTimers(s);
@@ -498,7 +595,8 @@ function startRecording(s,it,secs){
   setPhase(panel(s.u),"ready",`<div class="st"><span class="ph" id="rd-${s.u}">準備… 3</span><span class="hint">紅燈亮就開始唸 · 這句錄 ${secs} 秒</span></div>${modelsHTML(it)}`);
   let k=3;
   s.timers.push(setInterval(()=>{k=Math.max(1,k-1);const el=document.getElementById("rd-"+s.u);if(el)el.textContent="準備… "+k;},READY_MS/3));
-  freshMic().then(stream=>{
+  const micReady=s.micP?s.micP.then(st=>micLive(st)?st:freshMic(),()=>freshMic()):freshMic();
+  micReady.then(stream=>{
     if(s.cancelled)return;
     s.stream=stream;
     const mt=mimePick();
@@ -521,6 +619,8 @@ function startRecording(s,it,secs){
       const blob=new Blob(s.chunks,{type:rec.mimeType||mt||"audio/mp4"});
       if(recordings[s.u])URL.revokeObjectURL(recordings[s.u]);
       recordings[s.u]=URL.createObjectURL(blob);
+      recMeta[s.u]=Date.now();
+      saveRec(s.dayId,s.id,blob,blob.type,recMeta[s.u]);
       finishSession(s,'<span class="ph">✅ 錄好了</span> 聽聽看自己唸的，跟標準比一比。',true);
       quizMark(s.dayId,s.id,"practiced");
     };
@@ -567,7 +667,7 @@ function stopRecording(s){
 function playMine(dayId,id){
   const u=uid(dayId,id),url=recordings[u];if(!url)return;
   if(cur)stopShadow();
-  if(TTS){try{TTS.cancel();}catch(e){}}
+  ttsStop();
   if(!player){player=document.createElement("audio");player.setAttribute("playsinline","");player.preload="auto";document.body.appendChild(player);}
   stopPlayer();
   player.src=url;
@@ -579,13 +679,12 @@ function replayModel(dayId,id){
   if(cur)stopShadow();
   stopPlayer();
   if(!TTS||!window.SpeechSynthesisUtterance)return;
-  try{TTS.cancel();}catch(e){}
-  keepUtts=modelTexts(it).map(t=>{const u=new SpeechSynthesisUtterance(t);u.lang="en-US";if(enVoice)u.voice=enVoice;u.rate=0.9;return u;});
-  keepUtts.forEach(u=>TTS.speak(u));
+  speakNow(modelTexts(it));
 }
 
 window.addEventListener("hashchange",route);
 route();
+loadRecs();
 </script>
 </body>
 </html>
