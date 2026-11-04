@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="app-version" content="2026-11-04k">
+<meta name="app-version" content="2026-11-04l">
 <title>My English Practice</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -173,6 +173,8 @@ input[type=text]:focus{outline:none;border-color:var(--ink);background:#fff}
 .wd:hover{background:rgba(50,61,128,.08)}
 .wd.on{background:linear-gradient(180deg,transparent 38%,rgba(242,120,63,.42) 38%);color:#7a2d0c;box-shadow:inset 0 -2px 0 var(--ember)}
 .wd.hl{font-weight:700}
+.wd.say{box-shadow:inset 0 -3px 0 var(--ember);animation:wsay .9s var(--ease) infinite}
+@keyframes wsay{50%{box-shadow:inset 0 -1px 0 rgba(242,120,63,.35)}}
 .wd.pop{animation:wpop .42s var(--ease)}
 @keyframes wpop{0%{transform:scale(1)}40%{transform:scale(1.18)}100%{transform:scale(1)}}
 .wd{display:inline-block}
@@ -232,7 +234,7 @@ footer .wordmark{font-family:var(--f-display);font-weight:500;font-size:22vw;lin
 <script defer src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
 <script>
 // Bump BOTH this constant and the <meta name="app-version"> tag on every release.
-const APP_VERSION = "2026-11-04k";
+const APP_VERSION = "2026-11-04l";
 (function(){
   var el=document.getElementById('appver'); if(el) el.textContent='v'+APP_VERSION;
   var busy=false;
@@ -416,7 +418,7 @@ function renderNotes(n){
   app.innerHTML=`<div class="row"><button class="back" onclick="location.hash=''"><span class="disc">${BACK_SVG}</span>回首頁</button></div>
   <h2 class="page-title anim">📝 ${esc(n.title)}</h2>`+
   n.cards.map((c,ci)=>`<div class="card item ncard anim"><div class="topic"><span class="nnum">0${ci+1}</span>${c.icon} ${esc(c.name)}</div>`+
-    c.rows.map(r=>`<div class="nrow">${r.en.map(e=>`<div class="nen"><div class="q">${esc(e)}</div><button class="btn mic nsay" data-say="${esc(e)}" onclick="sayNote(this)" aria-label="播放">🔊</button></div>`).join("")}<div class="hint nnote">💡 ${esc(r.note)}</div></div>`).join("")+`</div>`).join("");
+    c.rows.map(r=>`<div class="nrow">${r.en.map(e=>`<div class="nen"><div class="q">${wordsHTML(e,{dayId:n.id,sent:e})}</div><button class="btn mic nsay" data-say="${esc(e)}" onclick="sayNote(this)" aria-label="播放">🔊</button></div>`).join("")}<div class="hint nnote">💡 ${esc(r.note)}</div></div>`).join("")+`</div>`).join("");
 }
 
 // ===== Views =====
@@ -478,7 +480,7 @@ function renderDay(day){
   <h2 class="page-title anim">📅 ${day.label}</h2>
   <div class="card task anim"><strong>今日任務：語句練習</strong> — <span id="sec-n"></span>
   <div class="bar"><div id="sec-bar"></div></div><div class="hint" id="sec-msg">覺得這題沒問題了，就按卡片下方的 ✅ 完成 勾起來。</div>
-  <div class="tiphint">📒 點句子裡不熟的字，就會加入單字本</div></div>`;
+  <div class="tiphint">📒 點句子裡不熟的字，就會念給你聽並加入單字本</div></div>`;
   html+=list.map(it=>cardHTML(day,it)).join("");
   html+=`<div class="row"><button class="btn ghost" onclick="resetDay('${day.id}')">重設這一天的勾選</button></div>`;
   app.innerHTML=html;
@@ -778,7 +780,7 @@ const GLOSS={
 const WKEY="english-words-v1";
 let words={};try{words=JSON.parse(localStorage.getItem(WKEY)||"{}")||{};}catch(e){}
 function saveWords(){try{localStorage.setItem(WKEY,JSON.stringify(words));}catch(e){}}
-// Saved words from before v2026-11-04k get their meaning from GLOSS.
+// Saved words from before v2026-11-04l get their meaning from GLOSS.
 (function(){let ch=false;Object.values(words).forEach(x=>{if(x&&!x.m&&GLOSS[x.w]){x.m=GLOSS[x.w].m;x.p=GLOSS[x.w].p;ch=true;}});if(ch)saveWords();})();
 // Fallback meanings (words not in GLOSS) from the free MyMemory API, cached locally.
 const LKEY="english-lookup-v1";
@@ -859,13 +861,25 @@ document.addEventListener("click",e=>{
   const el=e.target.closest&&e.target.closest(".wd");
   if(!el||e.target.closest("button,input,a"))return;
   if(view==="words"&&el.classList.contains("hl"))return;   // use ✕ 移除 for the card's own word
+  if(view!=="words")speakTapped(el);   // speak first, synchronously in the tap
   toggleWord(el);
   if(view==="words")renderWords();
 });
 document.addEventListener("keydown",e=>{
   const el=e.target.closest&&e.target.closest(".wd");
-  if(el&&(e.key==="Enter"||e.key===" ")){e.preventDefault();toggleWord(el);}
+  if(el&&(e.key==="Enter"||e.key===" ")){e.preventDefault();if(view!=="words")speakTapped(el);toggleWord(el);}
 });
+// Tapped word in a sentence: speak it once (never interrupts an active 跟讀 round).
+function tapWordText(el){return String(el.textContent||"").replace(/[’‘]/g,"'").replace(/[^A-Za-z0-9'\-]/g,"").replace(/^['\-]+|['\-]+$/g,"");}
+function speakTapped(el){
+  if(cur)return;   // shadowing is speaking/recording: just save, stay silent
+  const t=tapWordText(el);if(!t||!TTS||!window.SpeechSynthesisUtterance)return;
+  stopPlayer();
+  document.querySelectorAll(".wd.say").forEach(x=>x.classList.remove("say"));
+  el.classList.add("say");
+  speakNow([t],{rate:0.85,onEnd(){el.classList.remove("say");}});
+  setTimeout(()=>el.classList.remove("say"),2500);
+}
 // Speak a word or sentence synchronously inside the tap.
 function sayText(text,rate){
   if(cur)stopShadow();
