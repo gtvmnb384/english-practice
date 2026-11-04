@@ -6,87 +6,190 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="app-version" content="2026-11-04e">
+<meta name="app-version" content="2026-11-04f">
 <title>My English Practice</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gabarito:wght@500;600&family=Onest:wght@400;500;600&family=Noto+Sans+TC:wght@400;500;700&display=swap">
+<meta name="theme-color" content="#0d0b27">
+<script>
+// Hide animated parts until the intro runs (never longer than 1.6s, never with reduced motion).
+(function(){try{var r=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
+if(!r){var h=document.documentElement;h.classList.add("preanim");setTimeout(function(){h.classList.remove("preanim");},1600);}}catch(e){}})();
+</script>
 <style>
-:root{--bg:#fdf6ec;--card:#fff;--ink:#3b2f2a;--accent:#e07a5f;--accent2:#81b29a;--muted:#8a7b72;--line:#f0e2d0}
+/* Visual language inspired by the MIT "Farlight" template: indigo dusk, ember accent, frosted/white rounded cards, pill buttons. Recreated, not copied. */
+:root{
+  --ground:#eef0f7;--ink:#211c55;--white:#fff;--night:#0d0b27;--ember:#f2783f;--ember-d:#d9551f;
+  --muted:#57547a;--peri:#b8c1ee;--rose:#e7b6cb;--blue:#323d80;--line:#dde1f0;--ok:#2f8f6b;
+  --f-display:"Gabarito","PingFang TC","Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif;
+  --f-body:"Onest","PingFang TC","Noto Sans TC","Microsoft JhengHei",system-ui,-apple-system,sans-serif;
+  --r1:30px;--r2:22px;--pill:999px;
+  --shadow:0 22px 50px -26px rgba(13,11,39,.45);
+  --ease:cubic-bezier(.6,0,.2,1);
+}
 *{box-sizing:border-box}
-body{margin:0;font-family:"Segoe UI",system-ui,-apple-system,"PingFang TC","Microsoft JhengHei",sans-serif;background:var(--bg);color:var(--ink);line-height:1.55}
-header{background:linear-gradient(135deg,#f2a07b,#e07a5f);color:#fff;padding:24px 20px 20px;text-align:center}
-header h1{margin:0;font-size:1.7rem}
-header p{margin:6px 0 0;opacity:.95}
-.wrap{max-width:860px;margin:0 auto;padding:16px}
-.card{background:var(--card);border-radius:14px;padding:16px 18px;margin:12px 0;box-shadow:0 2px 8px rgba(120,80,40,.07);border:1px solid var(--line)}
-.day{display:block;text-decoration:none;color:var(--ink);cursor:pointer}
-.day h2{margin:0 0 4px;font-size:1.25rem}
-.day .meta{color:var(--muted);font-size:.9rem}
-.bar{height:10px;background:#f3e6d6;border-radius:999px;overflow:hidden;margin-top:8px}
-.bar>div{height:100%;background:var(--accent2);transition:width .4s}
-nav{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
-nav button,.back{border:none;background:#fff;color:var(--ink);padding:8px 14px;border-radius:999px;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.08);font-size:.95rem}
-nav button.on{background:var(--accent);color:#fff}
-.topic{font-size:.8rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
-.q{font-size:1.08rem;margin:6px 0 8px}
-.hint{font-size:.88rem;color:var(--muted)}
-input[type=text]{width:100%;padding:10px 12px;border:1px solid #e3d3bf;border-radius:10px;font-size:1rem;font-family:inherit;margin-top:6px}
-.row{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
-.btn{border:none;background:var(--accent);color:#fff;padding:9px 14px;border-radius:10px;cursor:pointer;font-size:.95rem}
-.btn.mic{background:var(--accent2)}.btn.mic.rec{background:#c0392b}
-.shadow{margin-top:10px;padding:12px 14px;border-radius:12px;background:#fbf1e4;border:1px dashed #ecd2b4;font-size:.95rem}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:clip}
+button,input{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+::selection{background:var(--peri);color:var(--ink)}
+.preanim .hero .w,.preanim .hero .sub,.preanim .hero .chips,.preanim #app{opacity:0}
+
+/* floating pill bar */
+.topbar{position:sticky;top:10px;z-index:40;display:flex;justify-content:space-between;align-items:center;gap:10px;margin:10px 12px 0;pointer-events:none}
+.topbar>*{pointer-events:auto}
+.brand{display:inline-flex;align-items:center;gap:10px;min-height:46px;padding:6px 18px 6px 8px;border-radius:var(--pill);background:rgba(255,255,255,.82);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:var(--shadow);text-decoration:none;color:var(--ink);font-family:var(--f-display);font-weight:500;font-size:17px;letter-spacing:-.01em}
+.mark{width:32px;height:32px;border-radius:50%;background:linear-gradient(180deg,var(--ember) 0 48%,var(--ink) 48%);display:grid;place-items:center;color:#fff;font-size:15px}
+.pillbtn{display:inline-flex;align-items:center;gap:10px;min-height:46px;padding:6px 6px 6px 18px;border:0;border-radius:var(--pill);background:var(--ink);color:#fff;font-weight:500;font-size:15px;cursor:pointer;box-shadow:var(--shadow);text-decoration:none}
+.disc{width:34px;height:34px;border-radius:50%;background:var(--ember);color:var(--night);display:grid;place-items:center;flex:none;transition:transform .5s var(--ease)}
+.disc svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+@media (hover:hover){.pillbtn:hover .disc,.quizbtn:hover .disc{transform:rotate(-45deg)}}
+
+/* hero: a rounded "dusk window" with a thick white frame */
+.hero{padding:12px 12px 0}
+.hero-window{position:relative;overflow:hidden;border:6px solid #fff;border-radius:var(--r1);box-shadow:var(--shadow);color:#fff;padding:92px 22px 26px;min-height:300px;
+  background:
+    radial-gradient(1.5px 1.5px at 12% 22%,#fff 60%,transparent 61%),radial-gradient(1px 1px at 28% 12%,#fff 60%,transparent 61%),
+    radial-gradient(1.2px 1.2px at 64% 18%,#fff 60%,transparent 61%),radial-gradient(1px 1px at 82% 30%,#fff 60%,transparent 61%),
+    radial-gradient(1.4px 1.4px at 46% 34%,rgba(255,255,255,.8) 60%,transparent 61%),radial-gradient(1px 1px at 90% 9%,#fff 60%,transparent 61%),
+    radial-gradient(120% 70% at 80% 115%,rgba(231,182,203,.95),rgba(231,182,203,0) 60%),
+    radial-gradient(90% 60% at 10% 120%,rgba(242,120,63,.55),rgba(242,120,63,0) 60%),
+    linear-gradient(180deg,var(--night) 0%,var(--ink) 45%,var(--blue) 100%)}
+.hero-window::after{content:"";position:absolute;left:-10%;right:-10%;bottom:-30px;height:90px;background:var(--night);border-radius:50% 50% 0 0/100% 100% 0 0;opacity:.55}
+.hero .eyebrow{color:var(--peri)}
+.hero h1{position:relative;z-index:1;margin:6px 0 10px;font-family:var(--f-display);font-weight:500;font-size:clamp(46px,14vw,92px);line-height:.92;letter-spacing:-.035em}
+.hero .ln{display:block;overflow:hidden;padding-bottom:.06em}
+.hero .w{display:inline-block}
+.hero .sub{position:relative;z-index:1;margin:0;max-width:30ch;color:#e9ebfa;font-size:16px}
+.chips{position:relative;z-index:1;display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:var(--pill);background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);font-size:13px;font-weight:500}
+body[data-view="day"] .hero-window,body[data-view="quiz"] .hero-window{min-height:0;padding:72px 20px 16px}
+body[data-view="day"] .hero h1,body[data-view="quiz"] .hero h1{font-size:28px;margin:0}
+body[data-view="day"] .hero .ln,body[data-view="quiz"] .hero .ln{display:inline}
+body[data-view="day"] .hero .eyebrow,body[data-view="quiz"] .hero .eyebrow{display:none}
+body[data-view="day"] .hero .sub,body[data-view="day"] .chips,body[data-view="quiz"] .hero .sub,body[data-view="quiz"] .chips{display:none}
+.hero{margin-top:-56px}
+
+.wrap{max-width:760px;margin:0 auto;padding:6px 14px 20px}
+.eyebrow{display:block;font-size:12.5px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.sec-head{margin:26px 6px 6px}
+.sec-head h2,.page-title{margin:2px 0 0;font-family:var(--f-display);font-weight:500;font-size:32px;line-height:1.05;letter-spacing:-.025em}
+.page-title{margin:10px 6px 2px}
+
+/* cards */
+.card{position:relative;background:#fff;border-radius:var(--r2);padding:18px 18px;margin:14px 0;box-shadow:0 1px 0 rgba(33,28,85,.04),0 18px 40px -28px rgba(13,11,39,.35);border:1px solid rgba(33,28,85,.06)}
+.day{display:block;text-decoration:none;color:var(--ink);cursor:pointer;padding:20px 20px 18px;transition:transform .4s var(--ease)}
+.day:active{transform:scale(.985)}
+.day h2{margin:0 0 6px;font-family:var(--f-display);font-weight:500;font-size:28px;letter-spacing:-.02em;line-height:1.1}
+.day .meta{color:var(--muted);font-size:14px;line-height:1.5}
+.day .meta+.meta{margin-top:8px;color:var(--ink);font-weight:500}
+.day::after{content:"→";position:absolute;right:16px;top:18px;width:38px;height:38px;border-radius:50%;background:var(--ember);color:var(--night);display:grid;place-items:center;font-weight:600}
+.day h2{padding-right:48px}
+.bar{height:8px;background:#e3e6f4;border-radius:var(--pill);overflow:hidden;margin-top:12px}
+.bar>div{height:100%;background:linear-gradient(90deg,var(--ink),var(--blue) 70%,var(--ember));border-radius:var(--pill);transition:width .6s var(--ease)}
+
+/* quiz call-to-action: a night window */
+.quizbtn{position:relative;display:flex;align-items:center;justify-content:space-between;gap:14px;width:100%;text-align:left;border:6px solid #fff;border-radius:var(--r1);padding:22px 18px 22px 22px;margin:18px 0 4px;color:#fff;cursor:pointer;box-shadow:var(--shadow);
+  background:radial-gradient(80% 90% at 100% 100%,rgba(242,120,63,.45),transparent 60%),linear-gradient(135deg,var(--night),var(--ink) 60%,var(--blue));font-family:var(--f-display);font-weight:500;font-size:28px;letter-spacing:-.02em;line-height:1.1;transition:transform .4s var(--ease)}
+.quizbtn:active{transform:scale(.985)}
+.quizbtn small{display:block;margin-top:6px;font-family:var(--f-body);font-size:14px;font-weight:400;letter-spacing:0;color:var(--peri)}
+.quizbtn .disc{width:48px;height:48px}
+
+/* tabs: segmented pill */
+nav.tabs{display:flex;gap:4px;margin:14px 0 4px;padding:5px;background:#fff;border-radius:var(--pill);box-shadow:var(--shadow)}
+nav.tabs button{flex:1;min-height:46px;border:0;border-radius:var(--pill);background:transparent;color:var(--muted);font-weight:600;font-size:15px;cursor:pointer;transition:background .35s var(--ease),color .35s var(--ease)}
+nav.tabs button.on{background:var(--ink);color:#fff}
+.back{display:inline-flex;align-items:center;gap:8px;min-height:44px;border:0;border-radius:var(--pill);background:#fff;color:var(--ink);padding:6px 16px 6px 6px;cursor:pointer;box-shadow:var(--shadow);font-weight:500;font-size:15px}
+.back .disc{width:32px;height:32px}
+
+.task{background:#fff}
+.task strong{font-family:var(--f-display);font-weight:500;font-size:19px;letter-spacing:-.01em}
+
+.topic{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;padding-right:90px}
+.q{font-family:var(--f-display);font-weight:500;font-size:21px;line-height:1.3;letter-spacing:-.01em;margin:8px 0 8px}
+.hint{font-size:14px;color:var(--muted)}
+input[type=text]{width:100%;min-height:50px;padding:12px 16px;border:1.5px solid transparent;border-radius:16px;background:var(--ground);font-size:16px;margin-top:10px;transition:border-color .3s,background .3s}
+input[type=text]:focus{outline:none;border-color:var(--ink);background:#fff}
+.row{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.btn{min-height:46px;border:none;background:var(--ink);color:#fff;padding:10px 18px;border-radius:var(--pill);cursor:pointer;font-size:15px;font-weight:500;transition:transform .2s var(--ease),background .3s}
+.btn:active,.back:active,.pillbtn:active{transform:scale(.96)}
+.btn.mic{background:var(--ember);color:var(--night);font-weight:600}
+.btn.mic.rec{background:var(--night);color:var(--ember)}
+.btn.ghost{background:var(--ground);color:var(--ink)}
+.btn.stop{background:var(--ember-d);color:#fff}
+
+.shadow{margin-top:12px;padding:14px 16px;border-radius:18px;background:#f6f7fc;border:1.5px solid var(--line);font-size:15px;transition:background .35s,border-color .35s}
 .shadow:empty{display:none}
-.shadow .model{font-weight:600;margin:4px 0 2px}
+.shadow .model{font-family:var(--f-display);font-weight:500;font-size:18px;line-height:1.35;margin:8px 0 2px}
 .shadow .st{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.shadow .turn{color:#c0392b;font-weight:700;font-size:1.05rem}
-.shadow .cd{font-variant-numeric:tabular-nums;background:#fff;border-radius:999px;padding:1px 10px;font-weight:700;color:#c0392b}
-.dot{width:12px;height:12px;border-radius:50%;background:#c0392b;display:inline-block;animation:pulse 1s infinite}
+.shadow .ph{font-weight:600;border-radius:var(--pill);padding:3px 12px;color:#fff;background:var(--muted);font-size:14px}
+.shadow .turn{color:var(--ember-d);font-weight:700;font-size:17px}
+.shadow .cd{font-variant-numeric:tabular-nums;background:#fff;border-radius:var(--pill);padding:2px 12px;font-weight:700;color:var(--ember-d)}
+.dot{width:12px;height:12px;border-radius:50%;background:var(--ember-d);display:inline-block;animation:pulse 1s infinite}
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.8)}}
-.tbar{height:6px;background:#f3d6cc;border-radius:999px;overflow:hidden;margin-top:8px}
-.tbar>div{height:100%;background:#c0392b;width:100%}
-.shadow .btn{font-size:.9rem;padding:8px 12px}
-.btn.stop{background:#c0392b}
-.btn.ghost{background:#f3e6d6;color:var(--ink)}
-.fb{margin-top:10px;padding:10px 12px;border-radius:10px;display:none;font-size:.95rem}
-.fb.ok{background:#e6f3ec;color:#2f6b4f;display:block}
-.fb.no{background:#fdeae4;color:#9a3d22;display:block}
-.card.item.checked{border:2px solid #4caf7d;background:#f6fcf8}
-.done-badge{float:right;background:#4caf7d;color:#fff;border-radius:999px;padding:2px 10px;font-size:.8rem;font-weight:700}
-.chkrow{border-top:1px dashed var(--line);padding-top:10px;margin-top:12px}
-.btn.chk{background:#fff;color:#2f6b4f;border:2px solid #4caf7d;font-weight:700}
-.btn.chk.on{background:#4caf7d;color:#fff}
-.quizbtn{display:block;width:100%;border:none;border-radius:16px;padding:18px 16px;margin:8px 0 14px;font-size:1.35rem;font-weight:800;color:#fff;cursor:pointer;background:linear-gradient(135deg,#6c8cd5,#8e6bd1);box-shadow:0 4px 12px rgba(90,80,180,.25)}
-.quizbtn small{display:block;font-size:.85rem;font-weight:400;opacity:.92;margin-top:4px}
-.day.alldone{border:2px solid #4caf7d}
-.party{float:right;background:#fff3c4;color:#8a6100;border-radius:999px;padding:2px 10px;font-size:.85rem;font-weight:700}
-.datetag{float:right;background:#eef2fb;color:#4a5f99;border-radius:999px;padding:2px 10px;font-size:.78rem}
-.qstat{float:right;margin-right:6px;background:#e6f3ec;color:#2f6b4f;border-radius:999px;padding:2px 10px;font-size:.78rem}
-.summary{border:2px solid #8e6bd1;text-align:center}
-.summary h3{margin:0 0 6px}
-.shadow .ph{font-weight:800;border-radius:999px;padding:2px 12px;color:#fff;background:#888}
-.shadow.ph-listen{background:#eaf2fd;border:2px solid #4a7fd4}
-.shadow.ph-listen .ph{background:#4a7fd4}
-.shadow.ph-ready{background:#fff6dc;border:2px solid #e0a800}
-.shadow.ph-ready .ph{background:#e0a800;font-size:1.1rem}
-.shadow.ph-rec{background:#fdecea;border:2px solid #c0392b}
-.shadow.ph-done{background:#e9f6ee;border:2px solid #4caf7d}
-.shadow.ph-done .ph{background:#4caf7d}
-.recinfo{margin-top:6px;font-size:.8rem;color:var(--muted)}
-.linkbtn{border:none;background:none;color:#b0543a;font-size:.8rem;padding:2px 4px;cursor:pointer;text-decoration:underline}
-.shadow.ph-warn{background:#fff4ec;border:2px solid #e07a5f}
-.blank{display:inline-block;min-width:60px;border-bottom:2px dashed var(--accent);margin:0 3px}
+.tbar{height:7px;background:#f9d7c6;border-radius:var(--pill);overflow:hidden;margin-top:10px}
+.tbar>div{height:100%;background:var(--ember-d);width:100%}
+.shadow .btn{font-size:14px;padding:8px 14px;min-height:42px}
+.shadow.ph-listen{background:#e9ecfb;border-color:var(--blue)}
+.shadow.ph-listen .ph{background:var(--blue)}
+.shadow.ph-ready{background:#fbedf3;border-color:#c96b95}
+.shadow.ph-ready .ph{background:#b4527f;font-size:16px}
+.shadow.ph-rec{background:#fff1e9;border-color:var(--ember)}
+.shadow.ph-done{background:#e8f5ef;border-color:var(--ok)}
+.shadow.ph-done .ph{background:var(--ok)}
+.shadow.ph-warn{background:#fff7ea;border-color:#e0a84f}
+.recinfo{margin-top:8px;font-size:13px;color:var(--muted)}
+.linkbtn{border:none;background:none;color:var(--ember-d);font-size:13px;padding:6px 4px;cursor:pointer;text-decoration:underline}
+
+.fb{margin-top:12px;padding:12px 14px;border-radius:16px;display:none;font-size:15px}
+.fb.ok{background:#e8f5ef;color:#1f5f47;display:block}
+.fb.no{background:#fdece4;color:#9a3d22;display:block}
+
+.card.item.checked{border:2px solid var(--ok);background:linear-gradient(180deg,#f3fbf7,#fff 120px)}
+.done-badge{position:absolute;right:14px;top:14px;background:var(--ok);color:#fff;border-radius:var(--pill);padding:3px 12px;font-size:12.5px;font-weight:600}
+.chkrow{border-top:1px dashed var(--line);padding-top:12px;margin-top:14px}
+.btn.chk{width:100%;background:#fff;color:var(--ok);border:2px solid var(--ok);font-weight:600}
+.btn.chk.on{background:var(--ok);color:#fff}
+.day.alldone{border:2px solid var(--ok)}
+.party{position:absolute;right:62px;top:22px;background:#fff1d6;color:#8a5a00;border-radius:var(--pill);padding:2px 10px;font-size:13px;font-weight:600}
+.datetag{position:absolute;right:14px;top:14px;background:#e9ecfb;color:var(--blue);border-radius:var(--pill);padding:3px 10px;font-size:12px;font-weight:600}
+.qstat{position:absolute;right:14px;top:42px;background:#e8f5ef;color:var(--ok);border-radius:var(--pill);padding:3px 10px;font-size:12px;font-weight:600}
+.summary{border:6px solid #fff;text-align:center;color:#fff;background:radial-gradient(80% 90% at 100% 100%,rgba(242,120,63,.4),transparent 60%),linear-gradient(135deg,var(--night),var(--ink));border-radius:var(--r1)}
+.summary h3{margin:0 0 8px;font-family:var(--f-display);font-weight:500;font-size:28px;letter-spacing:-.02em}
+.summary .btn{background:var(--ember);color:var(--night)}.summary .btn.ghost{background:rgba(255,255,255,.14);color:#fff}
+.summary .row{justify-content:center}
+.blank{display:inline-block;min-width:64px;border-bottom:2.5px solid var(--ember);margin:0 4px}
 .hidden{display:none}
-footer{text-align:center;color:var(--muted);font-size:.85rem;padding:24px}
+.rv{opacity:0;transform:translateY(26px)}
+.rv.in{opacity:1;transform:none;transition:opacity .8s var(--ease),transform .8s var(--ease)}
+
+footer{margin:28px 0 0;padding:34px 22px 0;background:var(--night);color:var(--peri);border-radius:var(--r1) var(--r1) 0 0;font-size:14px;overflow:hidden}
+footer .fl{max-width:760px;margin:0 auto;line-height:1.7}
+footer .wordmark{font-family:var(--f-display);font-weight:500;font-size:22vw;line-height:.8;letter-spacing:-.05em;color:var(--ink);margin:22px -4px -2vw;white-space:nowrap}
+@media (min-width:760px){footer .wordmark{font-size:170px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}.rv{opacity:1;transform:none}}
 </style>
 </head>
 <body>
-<header>
-  <h1>☕ My English Practice</h1>
-  <p>A little practice every day goes a long way. 加油！</p>
+<div class="topbar">
+  <a class="brand" href="#" onclick="location.hash='';return false;"><span class="mark">☕</span>My English</a>
+  <button class="pillbtn" onclick="startQuiz()">🎲 測驗<span class="disc"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></button>
+</div>
+<header class="hero">
+  <div class="hero-window">
+    <span class="eyebrow">Daily speaking practice · 每日英文</span>
+    <h1><span class="ln"><span class="w">My</span> <span class="w">English</span></span> <span class="ln"><span class="w">Practice</span></span></h1>
+    <p class="sub">A little practice every day goes a long way. 加油！</p>
+    <div class="chips"><span class="chip">🔊 跟讀</span><span class="chip">✅ 每日任務</span><span class="chip">🎲 隨機測驗</span></div>
+  </div>
 </header>
 <div class="wrap" id="app"></div>
-<footer>Progress is saved in this browser only · 🎙️ 錄音只存在這支手機上 · 🔊 跟讀：先聽標準發音，再錄自己的聲音 · <span id="appver" style="opacity:.6"></span></footer>
+<footer><div class="fl">Progress is saved in this browser only · 🎙️ 錄音只存在這支手機上 · 🔊 跟讀：先聽標準發音，再錄自己的聲音 · <span id="appver" style="opacity:.7"></span></div><div class="wordmark" aria-hidden="true">Speak up.</div></footer>
+<script defer src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
 <script>
 // Bump BOTH this constant and the <meta name="app-version"> tag on every release.
-const APP_VERSION = "2026-11-04e";
+const APP_VERSION = "2026-11-04f";
 (function(){
   var el=document.getElementById('appver'); if(el) el.textContent='v'+APP_VERSION;
   var busy=false;
@@ -155,6 +258,41 @@ const DAYS=[
 }
 ];
 
+// ===== Motion (GSAP optional; page works fully without it) =====
+const ARROW_SVG='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+const BACK_SVG='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>';
+const Motion=(function(){
+  let reduce=false;try{reduce=!!(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches);}catch(e){}
+  const root=document.documentElement;
+  let introDone=false,io=null;
+  const g=()=>(!reduce&&window.gsap)?window.gsap:null;
+  function intro(){
+    if(introDone)return;introDone=true;
+    const wasHidden=root.classList.contains("preanim");
+    root.classList.remove("preanim");
+    const G=g();if(!G||!wasHidden){view();return;}
+    G.from(".hero .w",{yPercent:110,duration:1.1,ease:"expo.out",stagger:.08});
+    G.from(".hero .sub,.hero .chips,.hero .eyebrow",{y:18,opacity:0,duration:.9,delay:.3,ease:"power3.out",stagger:.08});
+    G.from(".hero-window",{scale:1.03,duration:1.4,ease:"power3.out",clearProps:"transform"});
+    G.from(".topbar>*",{y:-20,opacity:0,duration:.8,ease:"power3.out",stagger:.08,clearProps:"all"});
+    view(.25);
+  }
+  // Entrance for the current view: first screen staggers in, the rest reveals on scroll.
+  function view(delay){
+    if(reduce)return;
+    const els=[...document.querySelectorAll("#app .anim")];
+    const G=g(),first=els.slice(0,6),rest=els.slice(6);
+    if(G)G.from(first,{y:28,opacity:0,duration:.75,delay:delay||0,ease:"power3.out",stagger:.06,clearProps:"transform,opacity"});
+    if(!rest.length||!("IntersectionObserver" in window))return;
+    if(io)io.disconnect();
+    io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target);}}),{rootMargin:"0px 0px -8% 0px"});
+    rest.forEach(el=>{el.classList.add("rv");io.observe(el);});
+  }
+  function pop(el){const G=g();if(G&&el)G.fromTo(el,{scale:.92},{scale:1,duration:.5,ease:"back.out(2.5)",clearProps:"transform"});}
+  return {intro,view,pop,routed(){if(introDone)view();}};
+})();
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",()=>Motion.intro());else setTimeout(()=>Motion.intro(),0);
+
 // ===== State =====
 const KEY="english-progress-v2";        // legacy: auto-"done" set by Check (before v2026-11-04d)
 const CKEY="english-checked-v1";        // ✅ 完成 check-offs = daily task status
@@ -184,15 +322,17 @@ function route(){
   const h=decodeURIComponent(location.hash.slice(1));
   if(h==="quiz"){if(!quiz)newQuiz();renderQuiz();}
   else{const day=dayById(h);day?renderDay(day):renderHome();}
+  document.body.dataset.view=view;
   window.scrollTo(0,0);
+  Motion.routed();
 }
 function renderHome(){
   view="home";quiz=null;
   const nSent=DAYS.reduce((n,d)=>n+d.sentences.length,0);
-  app.innerHTML=`<button class="quizbtn" id="quiz-btn" onclick="startQuiz()">🎲 隨機測驗<small>從所有日期隨機抽 ${Math.min(5,nSent)} 個句子來練習</small></button>
-  <h2 style="margin:8px 4px">練習日期</h2>`+DAYS.slice().reverse().map(d=>{
+  app.innerHTML=`<button class="quizbtn anim" id="quiz-btn" onclick="startQuiz()"><span>🎲 隨機測驗<small>從所有日期隨機抽 ${Math.min(5,nSent)} 個句子來練習</small></span><span class="disc">${ARROW_SVG}</span></button>
+  <div class="sec-head anim"><span class="eyebrow">Practice days</span><h2>練習日期</h2></div>`+DAYS.slice().reverse().map(d=>{
     const st=dayStats(d);
-    return `<a class="card day ${st.all?'alldone':''}" href="#${d.id}">${st.all?'<span class="party">🎉 完成</span>':''}<h2>📅 ${d.label}</h2>
+    return `<a class="card day anim ${st.all?'alldone':''}" href="#${d.id}">${st.all?'<span class="party">🎉 完成</span>':''}<h2>📅 ${d.label}</h2>
       <div class="meta">${d.topics}</div>
       <div class="meta">✅ 單字 ${st.nv}/${d.vocab.length} · 語句 ${st.ns}/${d.sentences.length}</div>
       <div class="bar"><div style="width:${st.n/st.total*100}%"></div></div></a>`;}).join("");
@@ -205,7 +345,7 @@ function cardHTML(day,it,opt){
   else{head=it.t+" · "+(it.type==="fill"?"Fill in the blank":"Fix the sentence");
     q=it.type==="fill"?it.q.replace(/___/g,'<span class="blank"></span>'):"“"+it.q+"”";
     ph=it.type==="fill"?"Type the missing words":"Type the corrected sentence";}
-  return `<div class="card item ${isChk?'checked':''}" id="card-${u}">
+  return `<div class="card item anim ${isChk?'checked':''}" id="card-${u}">
     ${opt.quiz?`<span class="datetag">📅 ${day.label}</span><span class="qstat hidden" id="qs-${u}"></span>`
       :`<span id="badge-${u}" class="done-badge ${isChk?'':'hidden'}">✓ 已完成</span>`}
     <div class="topic">${opt.quiz?`第 ${opt.num} 題 · `:""}${head}</div>
@@ -227,16 +367,17 @@ function renderDay(day){
   view="day";
   stopShadow();
   const list=tab==="vocab"?day.vocab.map(v=>({...v,kind:"vocab"})):day.sentences.map(s=>({...s,kind:"sent"}));
-  let html=`<div class="row"><button class="back" onclick="location.hash=''">← 所有日期</button></div>
-  <h2 style="margin:12px 4px 0">📅 ${day.label}</h2>
-  <nav><button id="tab-vocab" class="${tab==='vocab'?'on':''}" onclick="tab='vocab';renderDay(dayById('${day.id}'))"></button>
-  <button id="tab-sent" class="${tab==='sent'?'on':''}" onclick="tab='sent';renderDay(dayById('${day.id}'))"></button></nav>
-  <div class="card"><strong>今日任務：${tab==='vocab'?'單字':'語句練習'}</strong> — <span id="sec-n"></span>
+  let html=`<div class="row"><button class="back" onclick="location.hash=''"><span class="disc">${BACK_SVG}</span>所有日期</button></div>
+  <h2 class="page-title anim">📅 ${day.label}</h2>
+  <nav class="tabs anim"><button id="tab-vocab" class="${tab==='vocab'?'on':''}" onclick="tab='vocab';renderDay(dayById('${day.id}'));Motion.view()"></button>
+  <button id="tab-sent" class="${tab==='sent'?'on':''}" onclick="tab='sent';renderDay(dayById('${day.id}'));Motion.view()"></button></nav>
+  <div class="card task anim"><strong>今日任務：${tab==='vocab'?'單字':'語句練習'}</strong> — <span id="sec-n"></span>
   <div class="bar"><div id="sec-bar"></div></div><div class="hint" id="sec-msg">覺得這題沒問題了，就按卡片下方的 ✅ 完成 勾起來。</div></div>`;
   html+=list.map(it=>cardHTML(day,it)).join("");
   html+=`<div class="row"><button class="btn ghost" onclick="resetDay('${day.id}')">重設這一天的勾選</button></div>`;
   app.innerHTML=html;
   updateDayCounts(day);
+  document.body.dataset.view="day";
 }
 function updateDayCounts(day){
   const st=dayStats(day);
@@ -259,6 +400,7 @@ function toggleCheck(dayId,id){
   if(card)card.classList.toggle("checked",on);
   if(badge)badge.classList.toggle("hidden",!on);
   if(btn){btn.classList.toggle("on",on);btn.textContent=chkLabel(on);}
+  if(on)Motion.pop(badge);
   updateDayCounts(d);
 }
 
@@ -272,9 +414,9 @@ function startQuiz(){newQuiz();if(location.hash==="#quiz")route();else location.
 function renderQuiz(){
   view="quiz";
   const n=quiz.list.length;
-  let html=`<div class="row"><button class="back" onclick="location.hash=''">← 回首頁</button></div>
-  <h2 style="margin:12px 4px 0">🎲 隨機測驗</h2>
-  <div class="card"><strong>測驗進度</strong> — <span id="qprog">0 / ${n}</span>
+  let html=`<div class="row"><button class="back" onclick="location.hash=''"><span class="disc">${BACK_SVG}</span>回首頁</button></div>
+  <h2 class="page-title anim">🎲 隨機測驗</h2>
+  <div class="card task anim"><strong>測驗進度</strong> — <span id="qprog">0 / ${n}</span>
   <div class="bar"><div id="qbar" style="width:0"></div></div>
   <div class="hint">每題答對、看答案或跟讀錄完就算練習過。測驗結果不會影響每日的 ✅ 勾選。</div></div>`;
   html+=quiz.list.map((q,i)=>{const d=dayById(q.dayId);const it=items(d).find(x=>x.kind==="sent"&&x.id===q.id);return cardHTML(d,it,{quiz:true,num:i+1});}).join("");
