@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="app-version" content="2026-11-04h">
+<meta name="app-version" content="2026-11-04i">
 <title>My English Practice</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -204,6 +204,19 @@ footer .fl{max-width:760px;margin:0 auto;line-height:1.7}
 footer .wordmark{font-family:var(--f-display);font-weight:500;font-size:22vw;line-height:.8;letter-spacing:-.05em;color:var(--ink);margin:22px -4px -2vw;white-space:nowrap}
 @media (min-width:760px){footer .wordmark{font-size:170px}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}.rv{opacity:1;transform:none}}
+.notesbtn{text-decoration:none;color:#fff;background:radial-gradient(90% 100% at 0% 0%,rgba(242,120,63,.75),transparent 60%),linear-gradient(135deg,var(--ink),var(--night));font-size:24px}
+.notes-hero{background:radial-gradient(70% 80% at 100% 0%,rgba(242,120,63,.4),transparent 60%),linear-gradient(160deg,var(--night),var(--ink));color:#fff;border-radius:var(--r1);padding:26px 22px;margin:14px 0}
+.notes-hero h1{margin:6px 0 0;font-family:var(--f-display);font-size:30px;letter-spacing:-.02em}
+.notes-hero .eyebrow{color:var(--ember)}
+.ncard{background:linear-gradient(180deg,var(--night),#16123d);color:#fff;border-radius:var(--r2);padding:18px;margin:14px 0;border:1px solid rgba(242,120,63,.25);box-shadow:0 18px 40px -24px rgba(13,11,39,.6)}
+.nhead{display:flex;align-items:center;gap:10px;font-family:var(--f-display);font-size:19px;font-weight:600;color:var(--ember);margin-bottom:6px}
+.nnum{font-size:12px;color:var(--night);background:var(--ember);border-radius:999px;padding:3px 8px}
+.nrow{padding:12px 0;border-top:1px solid rgba(255,255,255,.08)}
+.nrow:first-of-type{border-top:0}
+.nen{display:flex;align-items:center;justify-content:space-between;gap:10px;font-family:var(--f-display);font-size:21px;line-height:1.3;margin:4px 0}
+.nsay{flex:none;width:40px;height:40px;border-radius:50%;border:0;background:rgba(242,120,63,.18);font-size:18px;cursor:pointer}
+.nsay.on{background:var(--ember)}
+.nnote{margin-top:6px;font-size:14px;color:#c9c6ee;background:rgba(255,255,255,.06);border-left:3px solid var(--ember);border-radius:10px;padding:8px 10px}
 </style>
 </head>
 <body>
@@ -224,7 +237,7 @@ footer .wordmark{font-family:var(--f-display);font-weight:500;font-size:22vw;lin
 <script defer src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
 <script>
 // Bump BOTH this constant and the <meta name="app-version"> tag on every release.
-const APP_VERSION = "2026-11-04h";
+const APP_VERSION = "2026-11-04i";
 (function(){
   var el=document.getElementById('appver'); if(el) el.textContent='v'+APP_VERSION;
   var busy=false;
@@ -289,6 +302,25 @@ const DAYS=[
   {id:"x4",t:"Bonus: Missing home",type:"fill",q:"Sometimes I really ___ Taiwanese night markets.",hint:"想念（一個字）",a:["miss"],show:"Sometimes I really miss Taiwanese night markets."},
   {id:"x5",t:"Bonus: Small talk",type:"fix",q:"How long time you stay in Europe?",hint:"How long have you ...",a:["how long have you been in europe","how long have you stayed in europe","how long are you staying in europe","how long will you stay in europe"],show:"How long have you been in Europe?"},
   {id:"x6",t:"Bonus: Ordering food",type:"fill",q:"Could I ___ the soup of the day, please?",hint:"點餐常用（一個字）",a:["have","get"],show:"Could I have the soup of the day, please?"}
+ ]
+},
+{
+ id:"2026-11-04", label:"11/4 對話",
+ topics:"Ordering at a café · Shopping for clothes · Chatting with a coworker",
+ vocab:[],
+ sentences:[
+  {id:"k1",t:"Ordering at a café",type:"fix",q:"I'd like a iced latte.",hint:"不可數飲料前面不加 a",a:["i'd like an iced latte","i would like an iced latte","i'd like iced latte"],show:"I'd like an iced latte."},
+  {id:"k2",t:"Ordering at a café",type:"fill",q:"I'll pay ___ card.",hint:"用卡付款（一個字）；I'll 比 I will 更順",a:["by"],show:"I'll pay by card."},
+  {id:"k3",t:"Ordering at a café",type:"fill",q:"Where can I find a ___?",hint:"充電器（一個字）",a:["charger"],show:"Where can I find a charger?"},
+  {id:"k4",t:"Ordering at a café",type:"fill",q:"Where are the ___?",hint:"插座（複數）",a:["outlets"],show:"Where are the outlets?"},
+  {id:"k5",t:"Ordering at a café",type:"fill",q:"You ___, thanks.",hint:"回應告別的自然說法",a:["too"],show:"You too, thanks."},
+  {id:"b1",t:"Shopping for clothes",type:"fix",q:"This is available?",hint:"問句 be 動詞放前面",a:["is this available"],show:"Is this available?"},
+  {id:"b2",t:"Shopping for clothes",type:"fill",q:"I'm looking for a ___.",hint:"M 號（尺寸）",a:["medium"],show:"I'm looking for a medium."},
+  {id:"b3",t:"Shopping for clothes",type:"fix",q:"I buy this for my girlfriend.",hint:"現在進行式 am buying；指代衣服用 it",a:["i'm buying it for my girlfriend","i am buying it for my girlfriend"],show:"I'm buying it for my girlfriend."},
+  {id:"w1",t:"Chatting with a coworker",type:"fix",q:"I chill at home this weekend.",hint:"週末已過，用過去式",a:["i chilled at home this weekend"],show:"I chilled at home this weekend."},
+  {id:"w2",t:"Chatting with a coworker",type:"fix",q:"I don't know who win.",hint:"who 後面接過去式",a:["i don't know who won","i do not know who won"],show:"I don't know who won."},
+  {id:"w3",t:"Chatting with a coworker",type:"fix",q:"I forget it.",hint:"用過去式，不用加 it",a:["i forgot"],show:"I forgot."},
+  {id:"w4",t:"Chatting with a coworker",type:"fill",q:"See you ___.",hint:"到時見（告別）",a:["then"],show:"See you then."}
  ]
 }
 ];
@@ -358,11 +390,46 @@ function dayById(id){return DAYS.find(d=>d.id===id);}
 function countDone(day,kind){return items(day).filter(i=>(!kind||i.kind===kind)&&checked[key(day,i.id)]).length;}
 function dayStats(d){const ns=countDone(d,"sent"),total=d.sentences.length;return {ns,n:ns,total,all:total>0&&ns===total};}
 
+
+// ===== 今日練習重點 (data-driven: add one entry per day) =====
+const NOTES=[
+{id:"2026-11-04",title:"11/4 今日練習重點",cards:[
+ {name:"情境一：咖啡廳點餐",icon:"☕",rows:[
+  {en:["I'd like an iced latte."],note:"不可數飲料前面不加 a"},
+  {en:["I'll pay by card."],note:"縮寫比 I will 更順"},
+  {en:["Where can I find a charger?","Where are the outlets?"],note:"charger 是充電器，outlet 是插座"},
+  {en:["You too, thanks."],note:"回告別的自然說法"}]},
+ {name:"情境二：服飾店買衣服",icon:"👕",rows:[
+  {en:["Is this available?"],note:"問有沒有貨，be 動詞放前面"},
+  {en:["I'm looking for a medium."],note:"尺寸說法"},
+  {en:["I'm buying it for my girlfriend."],note:"現在進行式 am buying；指代衣服用 it 不用 this"},
+  {en:["I'll pay by card."],note:"付款"}]},
+ {name:"情境三：跟同事聊天",icon:"💬",rows:[
+  {en:["I chilled at home this weekend."],note:"週末已過，用過去式"},
+  {en:["I don't know who won."],note:"who 後面接過去式"},
+  {en:["I forgot."],note:"忘記用過去式，不用再加 it"},
+  {en:["See you then."],note:"告別"}]}
+]}
+];
+function noteById(id){return NOTES.find(n=>n.id===id);}
+function esc(t){return String(t).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function sayNote(btn){const t=btn.getAttribute("data-say");if(!TTS||!window.SpeechSynthesisUtterance)return;
+  document.querySelectorAll(".nsay.on").forEach(b=>b.classList.remove("on"));btn.classList.add("on");
+  speakNow([t],{onEnd(){btn.classList.remove("on");}});}
+function renderNotes(n){
+  view="notes";
+  app.innerHTML=`<div class="row"><button class="back" onclick="location.hash=''"><span class="disc">${BACK_SVG}</span>回首頁</button></div>
+  <div class="notes-hero anim"><span class="eyebrow">Today's key points</span><h1>${esc(n.title)}</h1></div>`+
+  n.cards.map((c,ci)=>`<div class="ncard anim"><div class="nhead"><span class="nnum">0${ci+1}</span>${c.icon} ${esc(c.name)}</div>`+
+    c.rows.map(r=>`<div class="nrow">${r.en.map(e=>`<div class="nen"><span>${esc(e)}</span><button class="nsay" data-say="${esc(e)}" onclick="sayNote(this)" aria-label="播放">🔊</button></div>`).join("")}<div class="nnote">💡 ${esc(r.note)}</div></div>`).join("")+`</div>`).join("");
+}
+
 // ===== Views =====
 function route(){
   stopShadow();
   const h=decodeURIComponent(location.hash.slice(1));
   if(h==="quiz"){if(!quiz)newQuiz();renderQuiz();}
+  else if(h.startsWith("notes-")&&noteById(h.slice(6))){renderNotes(noteById(h.slice(6)));}
   else if(h==="words"){wordsMode="list";wordsIdx=0;renderWords();}
   else{const day=dayById(h);day?renderDay(day):renderHome();}
   document.body.dataset.view=view;
@@ -374,6 +441,7 @@ function renderHome(){
   const nSent=DAYS.reduce((n,d)=>n+d.sentences.length,0);
   app.innerHTML=`<button class="quizbtn anim" id="quiz-btn" onclick="startQuiz()"><span>🎲 隨機測驗<small>從所有日期隨機抽 ${Math.min(5,nSent)} 個句子來練習</small></span><span class="disc">${ARROW_SVG}</span></button>
   <a class="quizbtn wordsbtn anim" id="words-btn" href="#words"><span>📒 單字本<small>不熟的單字 <b class="wcount">${activeWords().length}</b> 個 · 中文解釋＋發音</small></span><span class="disc">${ARROW_SVG}</span></a>
+  `+NOTES.slice().reverse().map(n=>`<a class="quizbtn notesbtn anim" id="notes-btn-${n.id}" href="#notes-${n.id}"><span>📝 ${esc(n.title)}<small>${n.cards.map(c=>c.name.split("：")[1]||c.name).join(" · ")}</small></span><span class="disc">${ARROW_SVG}</span></a>`).join("")+`
   <div class="sec-head anim"><span class="eyebrow">Practice days</span><h2>練習日期</h2></div>`+DAYS.slice().reverse().map(d=>{
     const st=dayStats(d);
     return `<a class="card day anim ${st.all?'alldone':''}" href="#${d.id}">${st.all?'<span class="party">🎉 完成</span>':''}<h2>📅 ${d.label}</h2>
@@ -446,6 +514,38 @@ function toggleCheck(dayId,id){
 // NOTE: when you add a new day to DAYS, add GLOSS entries for any new words in its sentences
 // (prompts, correct answers and accepted answers). Words missing here fall back to an online lookup.
 const GLOSS={
+"chill":{m:"放鬆、耍廢",p:"v."},
+"win":{m:"贏",p:"v."},
+"forget":{m:"忘記",p:"v."},
+"an":{m:"一個（母音前的不定冠詞）",p:"art."},
+"available":{m:"有貨的；可取得的",p:"adj."},
+"buying":{m:"正在買（buy 的進行式）",p:"v."},
+"can":{m:"可以；能",p:"aux."},
+"card":{m:"卡片；信用卡",p:"n."},
+"charger":{m:"充電器",p:"n."},
+"chilled":{m:"放鬆、耍廢（chill 的過去式）",p:"v."},
+"chill":{m:"放鬆、耍廢",p:"v."},
+"find":{m:"找到",p:"v."},
+"forgot":{m:"忘記了（forget 的過去式）",p:"v."},
+"forget":{m:"忘記",p:"v."},
+"girlfriend":{m:"女朋友",p:"n."},
+"i'll":{m:"我會（I will）",p:"pron.+aux."},
+"iced":{m:"冰的",p:"adj."},
+"know":{m:"知道",p:"v."},
+"latte":{m:"拿鐵",p:"n."},
+"looking":{m:"尋找（look for 的進行式）",p:"v."},
+"medium":{m:"中號、M 號；中等的",p:"n./adj."},
+"outlets":{m:"插座（outlet 的複數）",p:"n."},
+"pay":{m:"付款",p:"v."},
+"see":{m:"看見；見面",p:"v."},
+"thanks":{m:"謝謝",p:"int."},
+"then":{m:"那時；到時候",p:"adv."},
+"this":{m:"這個",p:"pron."},
+"weekend":{m:"週末",p:"n."},
+"where":{m:"哪裡",p:"adv."},
+"who":{m:"誰",p:"pron."},
+"won":{m:"贏了（win 的過去式）",p:"v."},
+"win":{m:"贏",p:"v."},
 "a":{m:"一個（不定冠詞）",p:"art."},
 "about":{m:"關於",p:"prep."},
 "am":{m:"是（I am）",p:"v."},
@@ -606,7 +706,7 @@ const GLOSS={
 const WKEY="english-words-v1";
 let words={};try{words=JSON.parse(localStorage.getItem(WKEY)||"{}")||{};}catch(e){}
 function saveWords(){try{localStorage.setItem(WKEY,JSON.stringify(words));}catch(e){}}
-// Saved words from before v2026-11-04h get their meaning from GLOSS.
+// Saved words from before v2026-11-04i get their meaning from GLOSS.
 (function(){let ch=false;Object.values(words).forEach(x=>{if(x&&!x.m&&GLOSS[x.w]){x.m=GLOSS[x.w].m;x.p=GLOSS[x.w].p;ch=true;}});if(ch)saveWords();})();
 // Fallback meanings (words not in GLOSS) from the free MyMemory API, cached locally.
 const LKEY="english-lookup-v1";
