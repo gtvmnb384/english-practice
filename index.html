@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="app-version" content="2026-11-04j">
+<meta name="app-version" content="2026-11-04k">
 <title>My English Practice</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -232,7 +232,7 @@ footer .wordmark{font-family:var(--f-display);font-weight:500;font-size:22vw;lin
 <script defer src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
 <script>
 // Bump BOTH this constant and the <meta name="app-version"> tag on every release.
-const APP_VERSION = "2026-11-04j";
+const APP_VERSION = "2026-11-04k";
 (function(){
   var el=document.getElementById('appver'); if(el) el.textContent='v'+APP_VERSION;
   var busy=false;
@@ -304,18 +304,18 @@ const DAYS=[
  topics:"Ordering at a café · Shopping for clothes · Chatting with a coworker",
  vocab:[],
  sentences:[
-  {id:"k1",t:"Ordering at a café",type:"fix",q:"I'd like a iced latte.",hint:"不可數飲料前面不加 a",a:["i'd like an iced latte","i would like an iced latte","i'd like iced latte"],show:"I'd like an iced latte."},
-  {id:"k2",t:"Ordering at a café",type:"fill",q:"I'll pay ___ card.",hint:"用卡付款（一個字）；I'll 比 I will 更順",a:["by"],show:"I'll pay by card."},
-  {id:"k3",t:"Ordering at a café",type:"fill",q:"Where can I find a ___?",hint:"充電器（一個字）",a:["charger"],show:"Where can I find a charger?"},
-  {id:"k4",t:"Ordering at a café",type:"fill",q:"Where are the ___?",hint:"插座（複數）",a:["outlets"],show:"Where are the outlets?"},
-  {id:"k5",t:"Ordering at a café",type:"fill",q:"You ___, thanks.",hint:"回應告別的自然說法",a:["too"],show:"You too, thanks."},
-  {id:"b1",t:"Shopping for clothes",type:"fix",q:"This is available?",hint:"問句 be 動詞放前面",a:["is this available"],show:"Is this available?"},
-  {id:"b2",t:"Shopping for clothes",type:"fill",q:"I'm looking for a ___.",hint:"M 號（尺寸）",a:["medium"],show:"I'm looking for a medium."},
-  {id:"b3",t:"Shopping for clothes",type:"fix",q:"I buy this for my girlfriend.",hint:"現在進行式 am buying；指代衣服用 it",a:["i'm buying it for my girlfriend","i am buying it for my girlfriend"],show:"I'm buying it for my girlfriend."},
-  {id:"w1",t:"Chatting with a coworker",type:"fix",q:"I chill at home this weekend.",hint:"週末已過，用過去式",a:["i chilled at home this weekend"],show:"I chilled at home this weekend."},
-  {id:"w2",t:"Chatting with a coworker",type:"fix",q:"I don't know who win.",hint:"who 後面接過去式",a:["i don't know who won","i do not know who won"],show:"I don't know who won."},
-  {id:"w3",t:"Chatting with a coworker",type:"fix",q:"I forget it.",hint:"用過去式，不用加 it",a:["i forgot"],show:"I forgot."},
-  {id:"w4",t:"Chatting with a coworker",type:"fill",q:"See you ___.",hint:"到時見（告別）",a:["then"],show:"See you then."}
+  {id:"k1",t:"Ordering at a café",type:"fix",q:"Could I get a large ice latte with oat milk, and is it possible make it a little less sweet?",hint:"iced 冰的；would it be possible to + 原形",a:["could i get a large iced latte with oat milk and would it be possible to make it a little less sweet", "could i get a large iced latte with oat milk and is it possible to make it a little less sweet"],show:"Could I get a large iced latte with oat milk, and would it be possible to make it a little less sweet?"},
+  {id:"k2",t:"Ordering at a café",type:"fill",q:"I'll pay ___ card, and could you send the receipt to my email instead of printing it?",hint:"用卡付款（一個字）",a:["by"],show:"I'll pay by card, and could you send the receipt to my email instead of printing it?"},
+  {id:"k3",t:"Ordering at a café",type:"fill",q:"Do you happen to know where I can ___ a charger, or are there any outlets near the window seats?",hint:"找到（一個字）；間接問句語序",a:["find"],show:"Do you happen to know where I can find a charger, or are there any outlets near the window seats?"},
+  {id:"k4",t:"Ordering at a café",type:"fix",q:"Do you mind I sit here for a while? I need to plug my laptop because battery almost die.",hint:"Would you mind if I + 過去式；plug in；the battery is almost dead",a:["would you mind if i sat here for a while i need to plug in my laptop because the battery is almost dead", "do you mind if i sit here for a while i need to plug in my laptop because the battery is almost dead"],show:"Would you mind if I sat here for a while? I need to plug in my laptop because the battery is almost dead."},
+  {id:"k5",t:"Ordering at a café",type:"fill",q:"Thanks so much for your help today. You ___ — have a great rest of your day!",hint:"回應對方的祝福（一個字）",a:["too"],show:"Thanks so much for your help today. You too — have a great rest of your day!"},
+  {id:"b1",t:"Shopping for clothes",type:"fix",q:"Excuse me, this jacket still have black color, or you only have the colors on display?",hint:"問句 be 動詞放前面；available in + 顏色",a:["excuse me is this jacket still available in black or do you only have the colors on display"],show:"Excuse me, is this jacket still available in black, or do you only have the colors on display?"},
+  {id:"b2",t:"Shopping for clothes",type:"fill",q:"I'm looking for a ___, but if you've run out, could you check whether you have one in the back?",hint:"M 號（一個字）",a:["medium"],show:"I'm looking for a medium, but if you've run out, could you check whether you have one in the back?"},
+  {id:"b3",t:"Shopping for clothes",type:"fix",q:"I buy this for my girlfriend, so can I change it if it not fit her?",hint:"現在進行式；would it be possible to exchange；doesn't fit",a:["i'm buying it for my girlfriend so would it be possible to exchange it if it doesn't fit her", "i am buying it for my girlfriend so would it be possible to exchange it if it doesn't fit her", "i'm buying it for my girlfriend so can i exchange it if it doesn't fit her"],show:"I'm buying it for my girlfriend, so would it be possible to exchange it if it doesn't fit her?"},
+  {id:"b4",t:"Shopping for clothes",type:"fill",q:"I'll pay by card, but ___ you mind putting it in a gift bag for me?",hint:"Would you mind + V-ing（一個字）",a:["would"],show:"I'll pay by card, but would you mind putting it in a gift bag for me?"},
+  {id:"w1",t:"Chatting with a coworker",type:"fix",q:"I mostly chill at home this weekend because I was so tired after a so busy week.",hint:"週末已過用過去式；such a busy week",a:["i mostly chilled at home this weekend because i was exhausted after such a busy week at work", "i mostly chilled at home this weekend because i was so tired after such a busy week", "i mostly chilled at home this weekend because i was exhausted after such a busy week"],show:"I mostly chilled at home this weekend because I was exhausted after such a busy week at work."},
+  {id:"w2",t:"Chatting with a coworker",type:"fix",q:"I actually forgot it to watch the game last night, so I honestly don't know who win.",hint:"forget to + 原形；who 後接過去式",a:["i actually forgot to watch the game last night so i honestly don't know who won"],show:"I actually forgot to watch the game last night, so I honestly don't know who won."},
+  {id:"w3",t:"Chatting with a coworker",type:"fill",q:"I was wondering if you'd like to grab lunch on Friday. If that works for you, see you ___!",hint:"到時見（一個字）",a:["then"],show:"I was wondering if you'd like to grab lunch on Friday. If that works for you, see you then!"}
  ]
 }
 ];
@@ -390,20 +390,20 @@ function dayStats(d){const ns=countDone(d,"sent"),total=d.sentences.length;retur
 const NOTES=[
 {id:"2026-11-04",title:"11/4 今日練習重點",cards:[
  {name:"情境一：咖啡廳點餐",icon:"☕",rows:[
-  {en:["I'd like an iced latte."],note:"不可數飲料前面不加 a"},
-  {en:["I'll pay by card."],note:"縮寫比 I will 更順"},
-  {en:["Where can I find a charger?","Where are the outlets?"],note:"charger 是充電器，outlet 是插座"},
-  {en:["You too, thanks."],note:"回告別的自然說法"}]},
+  {en:["Could I get a large iced latte with oat milk, and would it be possible to make it a little less sweet?"],note:"冰飲用 iced（不是 ice）；點一杯時說 a large iced latte 或 an iced latte（母音前用 an）。Would it be possible to…? 是很禮貌的請求"},
+  {en:["I'll pay by card, and could you send the receipt to my email instead of printing it?"],note:"pay by card 用卡付款；I'll 比 I will 更順。instead of + V-ing「而不是…」"},
+  {en:["Do you happen to know where I can find a charger, or are there any outlets near the window seats?"],note:"charger 充電器、outlet 插座。Do you happen to know…? 比直接問更禮貌；間接問句用 where I can（不是 where can I）"},
+  {en:["Would you mind if I sat here for a while? I need to plug in my laptop because the battery is almost dead."],note:"Would you mind if I + 過去式 很客氣；plug in 插電；電池快沒電 = the battery is almost dead"},
+  {en:["Thanks so much for your help today. You too — have a great rest of your day!"],note:"對方說 Have a nice day 時，回 You too 最自然；have a great rest of your day 祝對方今天剩下的時間愉快"}]},
  {name:"情境二：服飾店買衣服",icon:"👕",rows:[
-  {en:["Is this available?"],note:"問有沒有貨，be 動詞放前面"},
-  {en:["I'm looking for a medium."],note:"尺寸說法"},
-  {en:["I'm buying it for my girlfriend."],note:"現在進行式 am buying；指代衣服用 it 不用 this"},
-  {en:["I'll pay by card."],note:"付款"}]},
+  {en:["Excuse me, is this jacket still available in black, or do you only have the colors on display?"],note:"問有沒有貨：Is this … available? be 動詞放前面；available in black 有黑色；第二個問句要加 do"},
+  {en:["I'm looking for a medium, but if you've run out, could you check whether you have one in the back?"],note:"尺寸說 a small / a medium / a large；run out 賣完；check whether 確認是否；in the back 倉庫"},
+  {en:["I'm buying it for my girlfriend, so would it be possible to exchange it if it doesn't fit her?"],note:"現在進行式 I'm buying；指衣服用 it；換貨用 exchange（不是 change）；if 子句用現在式 doesn't fit"},
+  {en:["I'll pay by card, but would you mind putting it in a gift bag for me?"],note:"Would you mind + V-ing? 禮貌請別人幫忙；gift bag 禮物袋"}]},
  {name:"情境三：跟同事聊天",icon:"💬",rows:[
-  {en:["I chilled at home this weekend."],note:"週末已過，用過去式"},
-  {en:["I don't know who won."],note:"who 後面接過去式"},
-  {en:["I forgot."],note:"忘記用過去式，不用再加 it"},
-  {en:["See you then."],note:"告別"}]}
+  {en:["I mostly chilled at home this weekend because I was exhausted after such a busy week at work."],note:"週末已過用過去式 chilled；exhausted 累壞了；such a + 形容詞 + 名詞（不是 a so busy week）"},
+  {en:["I actually forgot to watch the game last night, so I honestly don't know who won."],note:"forgot to + 原形，不用再加 it；who 後面接過去式 won"},
+  {en:["I was wondering if you'd like to grab lunch on Friday. If that works for you, see you then!"],note:"I was wondering if… 委婉邀約；grab lunch 一起吃個午餐；if that works for you 你方便的話；See you then 到時見"}]}
 ]}
 ];
 function noteById(id){return NOTES.find(n=>n.id===id);}
@@ -509,6 +509,83 @@ function toggleCheck(dayId,id){
 // NOTE: when you add a new day to DAYS, add GLOSS entries for any new words in its sentences
 // (prompts, correct answers and accepted answers). Words missing here fall back to an online lookup.
 const GLOSS={
+"large":{m:"大的；大杯",p:"adj."},
+"oat":{m:"燕麥",p:"n."},
+"milk":{m:"牛奶",p:"n."},
+"be":{m:"是（原形）",p:"v."},
+"possible":{m:"可能的",p:"adj."},
+"make":{m:"做；使",p:"v."},
+"little":{m:"一點點；小的",p:"adj."},
+"less":{m:"較少的",p:"adj."},
+"sweet":{m:"甜的",p:"adj."},
+"ice":{m:"冰（名詞）",p:"n."},
+"send":{m:"寄送",p:"v."},
+"receipt":{m:"收據",p:"n."},
+"email":{m:"電子郵件",p:"n."},
+"instead":{m:"代替；而不是（instead of）",p:"adv."},
+"printing":{m:"列印（print 的 -ing）",p:"v."},
+"do":{m:"做；助動詞",p:"v./aux."},
+"happen":{m:"碰巧；發生（happen to）",p:"v."},
+"or":{m:"或者",p:"conj."},
+"any":{m:"任何的",p:"det."},
+"near":{m:"在…附近",p:"prep."},
+"window":{m:"窗戶",p:"n."},
+"seats":{m:"座位（seat 的複數）",p:"n."},
+"mind":{m:"介意",p:"v."},
+"sat":{m:"坐（sit 的過去式）",p:"v."},
+"while":{m:"一會兒；當…時",p:"n./conj."},
+"plug":{m:"插（plug in 插電）",p:"v."},
+"laptop":{m:"筆電",p:"n."},
+"because":{m:"因為",p:"conj."},
+"battery":{m:"電池",p:"n."},
+"almost":{m:"幾乎",p:"adv."},
+"dead":{m:"沒電的；死的",p:"adj."},
+"sit":{m:"坐",p:"v."},
+"die":{m:"死；沒電",p:"v."},
+"much":{m:"很多；非常",p:"adv."},
+"your":{m:"你的",p:"det."},
+"help":{m:"幫忙",p:"n./v."},
+"great":{m:"很棒的",p:"adj."},
+"rest":{m:"剩下的部分；休息",p:"n."},
+"excuse":{m:"原諒（excuse me 不好意思）",p:"v."},
+"me":{m:"我（受詞）",p:"pron."},
+"still":{m:"仍然",p:"adv."},
+"black":{m:"黑色",p:"n./adj."},
+"only":{m:"只有",p:"adv."},
+"colors":{m:"顏色（color 的複數）",p:"n."},
+"display":{m:"展示；陳列",p:"n."},
+"color":{m:"顏色",p:"n."},
+"you've":{m:"你已經（you have）",p:"pron.+aux."},
+"run":{m:"跑（run out 用完、賣完）",p:"v."},
+"check":{m:"確認、查看",p:"v."},
+"whether":{m:"是否",p:"conj."},
+"exchange":{m:"換貨；交換",p:"v."},
+"doesn't":{m:"不（does not）",p:"aux."},
+"fit":{m:"合身",p:"v."},
+"her":{m:"她（受詞）",p:"pron."},
+"change":{m:"改變；更換",p:"v."},
+"not":{m:"不",p:"adv."},
+"putting":{m:"放（put 的 -ing）",p:"v."},
+"gift":{m:"禮物",p:"n."},
+"bag":{m:"袋子",p:"n."},
+"mostly":{m:"大部分；主要",p:"adv."},
+"exhausted":{m:"筋疲力盡的",p:"adj."},
+"after":{m:"在…之後",p:"prep."},
+"such":{m:"如此的（such a…）",p:"det."},
+"busy":{m:"忙碌的",p:"adj."},
+"week":{m:"週、星期",p:"n."},
+"tired":{m:"累的",p:"adj."},
+"actually":{m:"其實",p:"adv."},
+"watch":{m:"看（比賽、影片）",p:"v."},
+"game":{m:"比賽；遊戲",p:"n."},
+"last":{m:"上一個的（last night 昨晚）",p:"adj."},
+"honestly":{m:"老實說",p:"adv."},
+"wondering":{m:"想知道（I was wondering 委婉開頭）",p:"v."},
+"you'd":{m:"你會（you would）",p:"pron.+aux."},
+"grab":{m:"抓；順便吃（grab lunch）",p:"v."},
+"lunch":{m:"午餐",p:"n."},
+"friday":{m:"星期五",p:"n."},
+"works":{m:"可行；方便（that works）",p:"v."},
 "chill":{m:"放鬆、耍廢",p:"v."},
 "win":{m:"贏",p:"v."},
 "forget":{m:"忘記",p:"v."},
@@ -701,7 +778,7 @@ const GLOSS={
 const WKEY="english-words-v1";
 let words={};try{words=JSON.parse(localStorage.getItem(WKEY)||"{}")||{};}catch(e){}
 function saveWords(){try{localStorage.setItem(WKEY,JSON.stringify(words));}catch(e){}}
-// Saved words from before v2026-11-04j get their meaning from GLOSS.
+// Saved words from before v2026-11-04k get their meaning from GLOSS.
 (function(){let ch=false;Object.values(words).forEach(x=>{if(x&&!x.m&&GLOSS[x.w]){x.m=GLOSS[x.w].m;x.p=GLOSS[x.w].p;ch=true;}});if(ch)saveWords();})();
 // Fallback meanings (words not in GLOSS) from the free MyMemory API, cached locally.
 const LKEY="english-lookup-v1";
