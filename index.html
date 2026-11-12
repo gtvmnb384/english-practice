@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="app-version" content="2026-11-12a">
+<meta name="app-version" content="2026-11-12b">
 <title>My English Practice</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -234,7 +234,7 @@ footer .wordmark{font-family:var(--f-display);font-weight:500;font-size:22vw;lin
 <script defer src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
 <script>
 // Bump BOTH this constant and the <meta name="app-version"> tag on every release.
-const APP_VERSION = "2026-11-12a";
+const APP_VERSION = "2026-11-12b";
 (function(){
   var el=document.getElementById('appver'); if(el) el.textContent='v'+APP_VERSION;
   var busy=false;
@@ -337,6 +337,27 @@ const DAYS=[
   {id:"r2",t:"Checking out",type:"fix",q:"Could you keep my luggages here until my flight?",hint:"luggage 是不可數名詞，不加 s",a:["could you keep my luggage here until my flight"],show:"Could you keep my luggage here until my flight?"},
   {id:"f1",t:"Ordering veggie food",type:"fix",q:"Are the fries cooked in same fryer with the meat?",hint:"the same … as …",a:["are the fries cooked in the same fryer as the meat"],show:"Are the fries cooked in the same fryer as the meat?"},
   {id:"x1",t:"AI posts on X",type:"fill",q:"He claims he ___ ten paid apps, but I doubt it.",hint:"逆向工程（過去式，有連字號）",a:["reverse-engineered","reverse engineered"],show:"He claims he reverse-engineered ten paid apps, but I doubt it."}
+ ]
+},
+{
+ id:"2026-11-12-airport", label:"11/12 機場報到",
+ topics:"Finding the Starlux counter · Check-in for JX102 · Staff questions · Bags and carry-on · Vegetarian meal · Seat and gate · Signs at Prague Airport",
+ vocab:[],
+ sentences:[
+  {id:"c1",t:"Finding the counter",type:"fill",q:"Excuse me, where's the Starlux check-in ___? I can't find it.",hint:"櫃台（一個字，check-in ___）",a:["counter"],show:"Excuse me, where's the Starlux check-in counter? I can't find it."},
+  {id:"c2",t:"At the check-in counter",type:"fix",q:"Good morning! I fly to Taipei by JX102, and I already check in online.",hint:"今天要搭用 I'm flying；搭某班機用 on；已經報到好了用 I've already checked in",a:["good morning i'm flying to taipei on jx102 and i've already checked in online", "good morning i am flying to taipei on jx102 and i've already checked in online", "good morning i'm flying to taipei on jx102 and i have already checked in online", "good morning i am flying to taipei on jx102 and i have already checked in online"],show:"Good morning! I'm flying to Taipei on JX102, and I've already checked in online."},
+  {id:"c3",t:"Staff: Passport, please.",type:"fill",q:"Sure, here you ___. My boarding pass is on my phone too.",hint:"好，給你（Here you ___，一個字）",a:["go"],show:"Sure, here you go. My boarding pass is on my phone too."},
+  {id:"c4",t:"Checking a bag",type:"fill",q:"I'd like to ___ one bag. The backpack stays with me.",hint:"托運（2 個字，___ a bag）",a:["check in"],show:"I'd like to check in one bag. The backpack stays with me."},
+  {id:"c5",t:"Staff: Did you pack your bag yourself?",type:"fill",q:"Yeah, I packed it ___. Nobody else touched it.",hint:"我自己（一個字）",a:["myself"],show:"Yeah, I packed it myself. Nobody else touched it."},
+  {id:"c6",t:"Staff: Any batteries in your checked bag?",type:"fix",q:"No, they all in my carry-on, the power bank too.",hint:"they 後面少了 be 動詞 → they're",a:["no they're all in my carry-on the power bank too", "no they are all in my carry-on the power bank too"],show:"No, they're all in my carry-on, the power bank too."},
+  {id:"c7",t:"Staff: Your bag is overweight.",type:"fix",q:"Oh, how much over it is? I can take some stuff out.",hint:"直接問句 be 動詞要放主詞前面：is it",a:["oh how much over is it i can take some stuff out", "oh how much is it over i can take some stuff out"],show:"Oh, how much over is it? I can take some stuff out."},
+  {id:"c8",t:"Carry-on",type:"fix",q:"Can I keep this like carry-on? It's pretty small.",hint:"「當作」用 as，不是 like",a:["can i keep this as carry-on it's pretty small", "can i keep this as carry-on it is pretty small", "can i keep this as a carry-on it's pretty small", "can i keep this as a carry-on it is pretty small"],show:"Can I keep this as carry-on? It's pretty small."},
+  {id:"c9",t:"Vegetarian meal",type:"fill",q:"I ordered a vegetarian meal online. Is it ___ for this flight?",hint:"確認了（一個字，過去分詞）",a:["confirmed"],show:"I ordered a vegetarian meal online. Is it confirmed for this flight?"},
+  {id:"c10",t:"Seat",type:"fix",q:"Could I have a aisle seat? I get up a lot on long flights.",hint:"aisle 的 s 不發音，母音開頭，冠詞要用 an",a:["could i have an aisle seat i get up a lot on long flights"],show:"Could I have an aisle seat? I get up a lot on long flights."},
+  {id:"c11",t:"Gate and boarding time",type:"fix",q:"Thanks! Which gate, and what time boarding starts?",hint:"問句要倒裝：what time is boarding 或 what time does boarding start",a:["thanks which gate and what time is boarding", "thanks which gate and what time does boarding start"],show:"Thanks! Which gate, and what time is boarding?"},
+  {id:"c12",t:"Leaving the counter",type:"fill",q:"Got it, thanks so much. Have a ___ day!",hint:"祝你今天順利（一個字，Have a ___ day）",a:["nice", "good", "great"],show:"Got it, thanks so much. Have a nice day!"},
+  {id:"c13",t:"Sign: All biometric passports",type:"fill",q:"It says all ___ passports. Mine has a chip, so that's me, right?",hint:"生物辨識的（一個字，晶片護照標示上的字）",a:["biometric"],show:"It says all biometric passports. Mine has a chip, so that's me, right?"},
+  {id:"c14",t:"Sign: EU citizens",type:"fill",q:"The sign says EU ___, so I should go to the other line.",hint:"公民（一個字，複數）",a:["citizens"],show:"The sign says EU citizens, so I should go to the other line."}
  ]
 }
 ];
@@ -463,7 +484,31 @@ const NOTES=[
   {en:["a fork of an open-source project","DuoDesk is actually a fork of an open-source project, not his own."],note:"中文：從開源專案複製出來改的版本｜情境：標題寫逆向 TeamViewer，其實是改 TwinDesk｜出處：08 研究與戰略部 11/11"},
   {en:["self-improving agent","The article shows how to build a self-improving agent step by step."],note:"中文：會自我改進的 AI agent｜情境：14 步長文教學｜出處：08 研究與戰略部 11/11"},
   {en:["private key","Never paste your private key into a bot you don't fully trust."],note:"中文：（加密錢包的）私鑰｜情境：交易機器人教學要填 PRIVATE_KEY，外洩錢就會被提走｜出處：08 研究與戰略部 11/11"},
-  {en:["I just solved X forever","Posts that say I just solved this forever are usually just hype."],note:"中文：「我永遠解決了某某問題」（誇大標題句型）｜情境：流量網紅常用語｜出處：08 研究與戰略部 11/11"}]}
+  {en:["I just solved X forever","Posts that say I just solved this forever are usually just hype."],note:"中文：「我永遠解決了某某問題」（誇大標題句型）｜情境：流量網紅常用語｜出處：08 研究與戰略部 11/11"}]},
+ {name:"類別六：機場報到與出境",icon:"🛫",rows:[
+  {en:["Good morning!"],note:"中文：早安｜情境：走到櫃台先打招呼，中午以前都用 Good morning｜出處：景棠 11/12 布拉格機場（Secretary 轉述）"},
+  {en:["Hi, good morning."],note:"中文：嗨，早安｜情境：地勤先說 Good morning 時輕鬆回一句｜出處：景棠 11/12 布拉格機場（Secretary 轉述）"},
+  {en:["Thank you, have a nice day!"],note:"中文：謝謝，祝你今天順利｜情境：拿回護照和登機證、離開櫃台時說；對方常回 You too!｜出處：景棠 11/12 布拉格機場（Secretary 轉述）"},
+  {en:["I'm flying to Taipei on JX102."],note:"中文：我搭 JX102 飛台北｜情境：一到櫃台先講目的地和航班；搭某班機用 on；JX102 唸 J-X one-oh-two｜出處：景棠 11/12 布拉格機場（Secretary 轉述）"},
+  {en:["I've already checked in online."],note:"中文：我已經線上報到了｜情境：當面告訴地勤；和類別一的確認信 successfully checked in 相關，但這句是自己開口說的｜出處：景棠 11/12 布拉格機場（Secretary 轉述）"},
+  {en:["I'd like to check in one bag."],note:"中文：我要托運一件行李｜情境：check in a bag 在這裡是「托運」，不是報到｜出處：景棠 11/12 布拉格機場（Secretary 轉述）"},
+  {en:["Can I keep this as carry-on?"],note:"中文：這個可以當手提行李帶上飛機嗎？｜情境：指著背包或小行李箱問；keep … as … 把…留著當…｜出處：景棠 11/12 布拉格機場（Secretary 轉述）"},
+  {en:["Is my vegetarian meal confirmed?"],note:"中文：我的素食餐確認了嗎？｜情境：之前在 Manage My Trip 訂過，報到時再確認一次；confirmed 已確認｜出處：景棠 11/12 布拉格機場（Secretary 轉述）"},
+  {en:["Could I have an aisle seat?"],note:"中文：可以給我靠走道的位子嗎？｜情境：aisle 唸「愛ㄦ」，s 不發音，所以前面用 an；靠窗是 window seat｜出處：景棠 11/12 布拉格機場（Secretary 轉述）"},
+  {en:["Which gate, and what time is boarding?"],note:"中文：在哪個登機門？幾點開始登機？｜情境：拿到登機證時順便問；boarding 登機｜出處：景棠 11/12 布拉格機場（Secretary 轉述）"},
+  {en:["Where is the Starlux check-in counter?"],note:"中文：星宇的報到櫃台在哪裡？｜情境：剛進航廈找櫃台；check-in counter 報到櫃台｜出處：景棠 11/12 布拉格機場（Secretary 轉述）"},
+  {en:["Passport, please.","Sure, here you go."],note:"中文：請給我護照｜回答：Sure, here you go. 好，給你｜情境：地勤第一句通常就是這個｜出處：景棠 11/12 布拉格機場（Secretary 轉述）"},
+  {en:["Did you pack your bag yourself?","Yes, I packed it myself."],note:"中文：行李是你自己打包的嗎？｜回答：Yes, I packed it myself. 對，我自己打包的｜情境：安全提問，照實回答就好｜出處：景棠 11/12 布拉格機場（Secretary 轉述）"},
+  {en:["Any batteries, power banks, or lighters in your checked bag?","No, they're in my carry-on."],note:"中文：托運行李裡有電池、行動電源或打火機嗎？｜回答：No, they're in my carry-on. 沒有，都在我的手提行李裡｜情境：鋰電池和行動電源不能托運，要放隨身｜出處：景棠 11/12 布拉格機場（Secretary 轉述）"},
+  {en:["Please put your bag on the scale."],note:"中文：請把行李放到磅秤上｜情境：托運前秤重；scale 磅秤｜出處：景棠 11/12 布拉格機場（Secretary 轉述）"},
+  {en:["Your bag is overweight."],note:"中文：你的行李超重了｜情境：超重可能要加錢，或把東西移到手提行李；overweight 超重｜出處：景棠 11/12 布拉格機場（Secretary 轉述）"},
+  {en:["Your gate is ..., boarding starts at ..."],note:"中文：你的登機門是…，…點開始登機｜情境：… 會換成實際的登機門和時間，注意聽字母、數字，也可以再看登機證確認｜出處：景棠 11/12 布拉格機場（Secretary 轉述）"},
+  {en:["A-B Gates"],note:"中文：A、B 區登機門（往這個方向走）｜情境：機場指示牌；布拉格機場 A、B 區在第 1 航廈，主要是飛申根區以外的航班｜出處：景棠 11/12 布拉格機場（Secretary 轉述）"},
+  {en:["All biometric passports"],note:"中文：所有晶片護照（生物辨識護照）｜情境：出境護照查驗的排隊標示；台灣護照有晶片，但能不能走這條或自動閘門，以現場標示和人員指示為準｜出處：景棠 11/12 布拉格機場（Secretary 轉述）"},
+  {en:["short-term stay"],note:"中文：短期停留｜情境：護照查驗、簽證相關標示或問題；申根區免簽短期停留是 180 天內最多 90 天｜出處：景棠 11/12 布拉格機場（Secretary 轉述）"},
+  {en:["EU citizens"],note:"中文：歐盟公民｜情境：護照查驗分流標示，這條只給歐盟護照；台灣護照要排另一條｜出處：景棠 11/12 布拉格機場（Secretary 轉述）"},
+  {en:["Please have your boarding pass ready"],note:"中文：請準備好登機證｜情境：安檢或登機門前的標示，先把紙本或手機登機證拿出來｜出處：景棠 11/12 布拉格機場（Secretary 轉述）"},
+  {en:["Check-in"],note:"中文：報到櫃台｜情境：機場指示牌；捷克文寫 Přepážka（櫃台），英文和捷克文常並列｜出處：景棠 11/12 布拉格機場（Secretary 轉述）"}]}
 ]}
 ];
 function noteById(id){return NOTES.find(n=>n.id===id);}
@@ -627,7 +672,7 @@ const GLOSS={
 "color":{m:"顏色",p:"n."},
 "you've":{m:"你已經（you have）",p:"pron.+aux."},
 "run":{m:"跑（run out 用完、賣完）",p:"v."},
-"check":{m:"確認、查看",p:"v."},
+"check":{m:"確認、查看；check in 報到、托運（行李）",p:"v."},
 "whether":{m:"是否",p:"conj."},
 "exchange":{m:"換貨；交換",p:"v."},
 "doesn't":{m:"不（does not）",p:"aux."},
@@ -637,7 +682,7 @@ const GLOSS={
 "not":{m:"不",p:"adv."},
 "putting":{m:"放（put 的 -ing）",p:"v."},
 "gift":{m:"禮物",p:"n."},
-"bag":{m:"袋子",p:"n."},
+"bag":{m:"袋子；行李（checked bag 托運行李）",p:"n."},
 "mostly":{m:"大部分；主要",p:"adv."},
 "exhausted":{m:"筋疲力盡的",p:"adj."},
 "after":{m:"在…之後",p:"prep."},
@@ -692,7 +737,7 @@ const GLOSS={
 "are":{m:"是（複數／you）",p:"v."},
 "around":{m:"四處；在…周圍",p:"adv./prep."},
 "arrive":{m:"抵達（arrive at／in + 地點）",p:"v."},
-"as":{m:"作為；擔任",p:"prep."},
+"as":{m:"作為；當作；擔任",p:"prep."},
 "at":{m:"在（某地點）",p:"prep."},
 "back":{m:"回來；後面（in the back 店後面、倉庫）",p:"adv./n."},
 "beef":{m:"牛肉",p:"n."},
@@ -918,7 +963,7 @@ const GLOSS={
 "hyphen":{m:"連字號（-）",p:"n."},
 "i've":{m:"我已經…（I have）",p:"pron.+aux."},
 "invalid":{m:"無效的",p:"adj."},
-"keep":{m:"保管；寄放",p:"v."},
+"keep":{m:"保管；寄放；留著（keep this as carry-on 留著當手提）",p:"v."},
 "key":{m:"鑰匙；金鑰（private key 私鑰）",p:"n."},
 "lacto-ovo":{m:"蛋奶（lacto-ovo vegetarian 蛋奶素）",p:"adj."},
 "laundry":{m:"洗衣（laundry room 洗衣房）",p:"n."},
@@ -1017,7 +1062,66 @@ const GLOSS={
 "wave":{m:"揮手（招車）",p:"v."},
 "where's":{m:"…在哪裡（where is）",p:"adv.+v."},
 "which":{m:"哪一個（which way 往哪邊）",p:"det."},
-"x":{m:"X（某某；也是社群平台 X）",p:"n."}
+"x":{m:"X（某某；也是社群平台 X）",p:"n."},
+// --- v2026-11-12b: 11/12 機場報到 ---
+"a-b":{m:"A、B（A-B Gates：A、B 區登機門）",p:"n."},
+"aisle":{m:"走道（aisle seat 靠走道的位子；s 不發音）",p:"n."},
+"all":{m:"全部；所有（they're all… 全都…）",p:"det."},
+"already":{m:"已經",p:"adv."},
+"backpack":{m:"後背包",p:"n."},
+"bank":{m:"（power bank）行動電源的 bank",p:"n."},
+"banks":{m:"（power banks）行動電源（複數）",p:"n."},
+"batteries":{m:"電池（battery 的複數）",p:"n."},
+"biometric":{m:"生物辨識的（biometric passport 晶片護照）",p:"adj."},
+"chip":{m:"晶片（護照裡的晶片）",p:"n."},
+"citizens":{m:"公民（EU citizens 歐盟公民）",p:"n."},
+"confirmed":{m:"已確認的（confirm 的過去分詞）",p:"adj."},
+"counter":{m:"櫃台（check-in counter 報到櫃台）",p:"n."},
+"did":{m:"（過去式問句助動詞）Did you…? 你有沒有…",p:"aux."},
+"else":{m:"其他的（nobody else 沒有別人）",p:"adv."},
+"eu":{m:"歐盟（European Union）",p:"n."},
+"flights":{m:"航班；飛行（flight 的複數，long flights 長途飛行）",p:"n."},
+"fly":{m:"搭飛機；飛",p:"v."},
+"flying":{m:"搭飛機（I'm flying to… 我要飛去…）",p:"v."},
+"gates":{m:"登機門（gate 的複數）",p:"n."},
+"hi":{m:"嗨",p:"int."},
+"jx102":{m:"JX102（星宇航空布拉格飛台北的班機）",p:"n."},
+"lighters":{m:"打火機（lighter 的複數）",p:"n."},
+"line":{m:"隊伍；排隊的行列",p:"n."},
+"mine":{m:"我的（指我的護照）",p:"pron."},
+"morning":{m:"早上（Good morning 早安）",p:"n."},
+"nice":{m:"好的；愉快的（Have a nice day 祝你今天順利）",p:"adj."},
+"nobody":{m:"沒有人",p:"pron."},
+"oh":{m:"喔（表示驚訝）",p:"int."},
+"online":{m:"線上；在網路上",p:"adv."},
+"ordered":{m:"訂了；點了（order 的過去式）",p:"v."},
+"over":{m:"超過（how much over 超過多少）",p:"adv."},
+"overweight":{m:"超重的（行李）",p:"adj."},
+"pack":{m:"打包（行李）",p:"v."},
+"packed":{m:"打包了（pack 的過去式）",p:"v."},
+"passport":{m:"護照",p:"n."},
+"passports":{m:"護照（複數）",p:"n."},
+"phone":{m:"手機",p:"n."},
+"power":{m:"（power bank）行動電源的 power",p:"n."},
+"pretty":{m:"蠻、相當（口語，pretty small 蠻小的）",p:"adv."},
+"put":{m:"放",p:"v."},
+"ready":{m:"準備好的",p:"adj."},
+"scale":{m:"磅秤（秤行李的秤）",p:"n."},
+"short-term":{m:"短期的（short-term stay 短期停留）",p:"adj."},
+"should":{m:"應該",p:"aux."},
+"sign":{m:"標示；指示牌",p:"n."},
+"start":{m:"開始（does boarding start 幾點開始登機）",p:"v."},
+"starts":{m:"開始（boarding starts 開始登機）",p:"v."},
+"stays":{m:"留著；待在（stays with me 跟著我、不托運）",p:"v."},
+"stuff":{m:"東西（口語）",p:"n."},
+"taipei":{m:"台北",p:"n."},
+"thank":{m:"謝謝（Thank you）",p:"v."},
+"they":{m:"他們；它們（指那些東西）",p:"pron."},
+"they're":{m:"它們是／它們在（they are）",p:"pron.+v."},
+"touched":{m:"碰過（touch 的過去式）",p:"v."},
+"yeah":{m:"對啊（口語的 yes）",p:"int."},
+"yes":{m:"是；對",p:"adv."},
+"yourself":{m:"你自己",p:"pron."}
 };
 
 // ===== 不熟單字 (tap a word) + 📒 單字本 =====
